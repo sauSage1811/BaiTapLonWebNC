@@ -30,3 +30,15 @@ VALUES
 ('Bàn 4', 'empty'),
 ('Bàn 5', 'empty'),
 ('Mang về', 'empty');
+
+INSERT INTO orders (table_id, user_id, total_amount, status)
+VALUES
+(1, 1, 50000, 'pending'),
+(2, 1, 75000, 'paid');
+
+INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
+VALUES
+(1, 1, 2, 25000, 50000),
+(2, 2, 1, 20000, 20000),
+(2, 4, 1, 35000, 35000),
+(2, 8, 2, 5000, 10000);

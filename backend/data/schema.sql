@@ -28,7 +28,7 @@ CREATE TABLE products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     price REAL NOT NULL,
-    category_id INTEGER,
+    category_id INTEGER NOT NULL,
     image TEXT,
     status TEXT NOT NULL DEFAULT 'active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -47,8 +47,8 @@ CREATE TABLE tables (
 
 CREATE TABLE orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_id INTEGER,
-    user_id INTEGER,
+    table_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     total_amount REAL NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -66,7 +66,7 @@ CREATE TABLE orders (
 CREATE TABLE order_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id INTEGER NOT NULL,
-    product_id INTEGER,
+    product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
     price REAL NOT NULL,
     subtotal REAL NOT NULL,

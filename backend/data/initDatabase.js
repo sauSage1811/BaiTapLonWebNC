@@ -15,6 +15,7 @@ db.serialize(() => {
     db.exec(schema, (err) => {
         if (err) {
             console.error("Lỗi tạo bảng:", err.message);
+            db.close();
             return;
         }
 
@@ -23,13 +24,13 @@ db.serialize(() => {
         db.exec(seed, (err) => {
             if (err) {
                 console.error("Lỗi thêm dữ liệu mẫu:", err.message);
+                db.close();
                 return;
             }
 
             console.log("Thêm dữ liệu mẫu thành công");
             console.log("Database đã tạo tại:", dbPath);
+            db.close();
         });
     });
 });
-
-db.close();
