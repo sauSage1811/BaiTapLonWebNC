@@ -6,6 +6,7 @@ const productRoutes = require("./routes/productRoutes");
 const createOrderRoute = require("./routes/createOrderRoute");
 const categoryRoutes = require("./routes/categoryRoutes");
 const authRoutes = require("./routes/authRoutes");
+const tableRoutes = require("./routes/tableRoutes");
 
 const app = express();
 const port = 3000;
@@ -39,9 +40,8 @@ app.get("/api/test-db", (req, res) => {
 
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/tables", tableRoutes);
 app.use("/api/auth", authRoutes);
-
-//An
 app.use("/api/orders", createOrderRoute);
 
 
