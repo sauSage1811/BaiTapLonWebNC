@@ -3,6 +3,7 @@ const cors = require("cors");
 const db = require("./config/db");
 
 const productRoutes = require("./routes/productRoutes");
+const createOrderRoute = require("./routes/createOrderRoute");
 
 const app = express();
 const port = 3000;
@@ -35,6 +36,10 @@ app.get("/api/test-db", (req, res) => {
 });
 
 app.use("/api/products", productRoutes);
+
+//An
+app.use("/api/orders", createOrderRoute);
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
