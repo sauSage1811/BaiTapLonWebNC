@@ -27,8 +27,11 @@ function Login() {
     return (
         <div className="login-page">
             <div className="login-box">
-                <h2>Đăng nhập hệ thống</h2>
-                <p>Web quản lý bán cafe</p>
+                <div className="login-logo">
+                    <div className="login-logo-icon">☕</div>
+                    <h2>Coffee Management</h2>
+                    <p className="login-subtitle">Hệ thống quản lý bán cafe</p>
+                </div>
 
                 {error && <div className="error-message">{error}</div>}
 
