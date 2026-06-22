@@ -3,12 +3,12 @@ const cors = require("cors");
 const db = require("./config/db");
 
 const productRoutes = require("./routes/productRoutes");
-const createOrderRoute = require("./routes/createOrderRoute");
 const categoryRoutes = require("./routes/categoryRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tableRoutes = require("./routes/tableRoutes");
 
 
+const createOrderRoute  = require("./routes/createOrderRoute");
 
 
 const app = express();
@@ -46,7 +46,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/tables", tableRoutes);
 app.use("/api/auth", authRoutes);
 
-
+app.use("/api/orders", createOrderRoute);
 
 
 app.listen(port, () => {
