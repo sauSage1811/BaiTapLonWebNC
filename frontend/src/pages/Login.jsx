@@ -6,8 +6,8 @@ function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    const [username, setUsername] = useState("admin");
-    const [password, setPassword] = useState("123456");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
