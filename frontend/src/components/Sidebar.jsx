@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import logoImg from "../assets/logo.png";
 
 const adminMenuItems = [
     { to: "/dashboard", icon: "\ud83d\udcca", label: "Dashboard" },
@@ -20,7 +21,7 @@ function Sidebar({ collapsed, onToggle }) {
         <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
             <div className="sidebar-brand">
                 <div className="sidebar-brand-inner">
-                    <div className="sidebar-brand-icon">{"\u2615"}</div>
+                    <div className="sidebar-brand-icon"><img src={logoImg} alt="Cafe PKA Logo" className="sidebar-logo-img" /></div>
                     <div className="sidebar-brand-text">
                         <h2 className="logo">Cafe PKA</h2>
                         <span className="logo-sub">Quản Lý Hệ Thống</span>
@@ -34,7 +35,7 @@ function Sidebar({ collapsed, onToggle }) {
                     aria-expanded={!collapsed}
                     title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
-                    <span aria-hidden="true">{collapsed ? ">" : "<"}</span>
+                    <span aria-hidden="true">{collapsed ? "≡" : "≡"}</span>
                 </button>
             </div>
 
@@ -42,7 +43,11 @@ function Sidebar({ collapsed, onToggle }) {
 
             <nav>
                 {menuItems.map((item) => (
-                    <NavLink key={item.to} to={item.to} title={item.label}>
+                    <NavLink 
+                        key={item.to} 
+                        to={item.to} 
+                        title={item.label}
+                    >
                         <span className="nav-icon" aria-hidden="true">{item.icon}</span>
                         <span className="nav-label">{item.label}</span>
                     </NavLink>
