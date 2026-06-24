@@ -14,6 +14,8 @@ CREATE TABLE users (
     password TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'staff',
     status TEXT NOT NULL DEFAULT 'active',
+    security_question TEXT,
+    security_answer TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

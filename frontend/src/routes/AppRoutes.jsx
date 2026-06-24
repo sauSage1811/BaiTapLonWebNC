@@ -5,6 +5,8 @@ import { AuthContext } from "../context/AuthContext";
 import MainLayout from "../layouts/MainLayout";
 
 import Login from "../pages/Login";
+import Register from "../pages/Register";
+import ForgotPassword from "../pages/ForgotPassword";
 import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
@@ -47,8 +49,12 @@ function ProtectedLayout({ children }) {
 function AppRoutes() {
     return (
         <Routes>
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
+            {/* Protected Routes */}
             <Route
                 path="/dashboard"
                 element={

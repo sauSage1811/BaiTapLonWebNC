@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 function Login() {
@@ -58,6 +58,16 @@ function Login() {
 
                     <button type="submit">Đăng nhập</button>
                 </form>
+
+                <div className="login-links">
+                    <Link to="/forgot-password" className="link-forgot-password">
+                        Quên mật khẩu?
+                    </Link>
+                    <span className="link-separator">|</span>
+                    <Link to="/register" className="link-register">
+                        Tạo tài khoản
+                    </Link>
+                </div>
             </div>
         </div>
     );

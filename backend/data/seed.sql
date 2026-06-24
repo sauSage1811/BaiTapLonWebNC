@@ -1,7 +1,7 @@
-INSERT INTO users (full_name, username, password, role, status)
+INSERT INTO users (full_name, username, password, role, status, security_question, security_answer)
 VALUES
-('Quản trị viên', 'admin', '123456', 'admin', 'active'),
-('Nhân viên bán hàng', 'staff', '123456', 'staff', 'active');
+('Quản trị viên', 'admin', '123456', 'admin', 'active', 'Tên quán cafe của bạn là gì?', 'cafe pka'),
+('Nhân viên bán hàng', 'staff', '123456', 'staff', 'active', 'Thành phố bạn sống là gì?', 'ho chi minh');
 
 INSERT INTO categories (name, description)
 VALUES

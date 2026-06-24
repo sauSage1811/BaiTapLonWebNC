@@ -4,6 +4,18 @@ export function loginApi(data) {
     return api.post("/auth/login", data);
 }
 
+export function registerApi(data) {
+    return api.post("/auth/register", data);
+}
+
+export function forgotPasswordApi(data) {
+    return api.post("/auth/forgot-password", data);
+}
+
+export function resetPasswordApi(data) {
+    return api.post("/auth/reset-password", data);
+}
+
 export function getMeApi() {
     return api.get("/auth/me");
 }
