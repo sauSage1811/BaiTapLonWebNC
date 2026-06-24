@@ -1,27 +1,41 @@
 function TablePage() {
-    // Dữ liệu mẫu cho UI
+    // Dữ liệu mẫu cho bàn
     const sampleTables = [
-        { id: 1, name: "Bàn 01", status: "empty" },
-        { id: 2, name: "Bàn 02", status: "using" },
-        { id: 3, name: "Bàn 03", status: "empty" },
-        { id: 4, name: "Bàn 04", status: "using" },
-        { id: 5, name: "Bàn 05", status: "empty" },
-        { id: 6, name: "Bàn 06", status: "empty" },
-        { id: 7, name: "Bàn 07", status: "using" },
-        { id: 8, name: "Bàn 08", status: "empty" },
-        { id: 9, name: "Bàn 09", status: "empty" },
-        { id: 10, name: "Bàn 10", status: "using" },
-        { id: 11, name: "Bàn 11", status: "empty" },
-        { id: 12, name: "Bàn 12", status: "empty" },
+        { id: 1, tableNumber: "01", capacity: 2, status: "available", floor: "Tầng 1" },
+        { id: 2, tableNumber: "02", capacity: 2, status: "occupied", floor: "Tầng 1" },
+        { id: 3, tableNumber: "03", capacity: 4, status: "available", floor: "Tầng 1" },
+        { id: 4, tableNumber: "04", capacity: 4, status: "occupied", floor: "Tầng 1" },
+        { id: 5, tableNumber: "05", capacity: 6, status: "available", floor: "Tầng 2" },
+        { id: 6, tableNumber: "06", capacity: 6, status: "available", floor: "Tầng 2" },
+        { id: 7, tableNumber: "07", capacity: 8, status: "maintenance", floor: "Tầng 2" },
+        { id: 8, tableNumber: "08", capacity: 2, status: "available", floor: "Tầng 1" },
     ];
 
-    const statusLabel = {
-        empty: "Bàn trống",
-        using: "Đang sử dụng",
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case "available":
+                return "badge-success";
+            case "occupied":
+                return "badge-warning";
+            case "maintenance":
+                return "badge-danger";
+            default:
+                return "badge-default";
+        }
     };
 
-    const emptyCount = sampleTables.filter(t => t.status === "empty").length;
-    const usingCount = sampleTables.filter(t => t.status === "using").length;
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case "available":
+                return "Trống";
+            case "occupied":
+                return "Đang sử dụng";
+            case "maintenance":
+                return "Bảo trì";
+            default:
+                return "Không xác định";
+        }
+    };
 
     return (
         <div>
@@ -29,44 +43,74 @@ function TablePage() {
             <div className="page-header">
                 <div className="page-header-text">
                     <h1>🪑 Quản lý bàn</h1>
-                    <p>Quản lý trạng thái bàn trống và bàn đang sử dụng trong quán.</p>
+                    <p>Quản lý các bàn, sức chứa, tầng và trạng thái bàn.</p>
                 </div>
                 <button className="btn btn-primary">
                     ➕ Thêm bàn
                 </button>
             </div>
 
-            {/* Summary badges */}
-            <div className="page-toolbar" style={{ marginBottom: 24 }}>
+            {/* Toolbar: Search and Filters */}
+            <div className="page-toolbar">
                 <div className="page-toolbar-left">
-                    <span className="badge badge-empty">🟢 Trống: {emptyCount}</span>
-                    <span className="badge badge-using">🟠 Đang dùng: {usingCount}</span>
-                    <span className="badge badge-info">📊 Tổng: {sampleTables.length}</span>
+                    <div className="search-bar">
+                        <span className="search-bar-icon">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm bàn..."
+                        />
+                    </div>
+                </div>
+                <div className="page-toolbar-right">
+                    <span style={{ fontSize: 13, color: '#78716c', fontWeight: 500 }}>
+                        Tổng: {sampleTables.length} bàn
+                    </span>
                 </div>
             </div>
 
-            {/* Table Grid */}
-            <div className="table-grid">
-                {sampleTables.map((table) => (
-                    <div
-                        key={table.id}
-                        className={`table-card animate-in status-${table.status}`}
-                    >
-                        <div className="table-card-icon">
-                            {table.status === "empty" ? "🪑" : "☕"}
-                        </div>
-                        <div className="table-card-name">{table.name}</div>
-                        <div className="table-card-status">
-                            <span className={`badge badge-${table.status}`}>
-                                {table.status === "empty" ? "🟢" : "🟠"} {statusLabel[table.status]}
-                            </span>
-                        </div>
-                        <div className="table-card-actions">
-                            <button className="btn btn-sm btn-edit">✏️ Sửa</button>
-                            <button className="btn btn-sm btn-delete">🗑️ Xóa</button>
-                        </div>
-                    </div>
-                ))}
+            {/* Table Card */}
+            <div className="card animate-in">
+                <div className="card-body">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th className="col-stt">STT</th>
+                                <th>Số bàn</th>
+                                <th>Sức chứa</th>
+                                <th>Tầng</th>
+                                <th>Trạng thái</th>
+                                <th className="col-actions">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sampleTables.map((table, index) => (
+                                <tr key={table.id}>
+                                    <td className="col-stt">{index + 1}</td>
+                                    <td>
+                                        <span className="table-number">Bàn {table.tableNumber}</span>
+                                    </td>
+                                    <td>
+                                        <span className="table-capacity">{table.capacity} chỗ</span>
+                                    </td>
+                                    <td>
+                                        <span className="table-floor">{table.floor}</span>
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${getStatusBadgeClass(table.status)}`}>
+                                            {getStatusLabel(table.status)}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="table-actions">
+                                            <button className="btn btn-sm btn-edit">✏️ Sửa</button>
+                                            <button className="btn btn-sm btn-delete">🗑️ Xóa</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

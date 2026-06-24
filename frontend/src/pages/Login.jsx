@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import logoImg from "../assets/logo.png";
 
 function Login() {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ function Login() {
         <div className="login-page">
             <div className="login-box">
                 <div className="login-logo">
-                    <div className="login-logo-icon">☕</div>
+                    <img src={logoImg} alt="Coffee Management Logo" className="login-logo-img" />
                     <h2>Coffee Management</h2>
                     <p className="login-subtitle">Hệ thống quản lý bán cafe</p>
                 </div>
