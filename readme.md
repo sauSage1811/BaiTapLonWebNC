@@ -62,8 +62,8 @@ coffee-management/
 │  │  ├─ assets/
 │  │  ├─ components/
 │  │  ├─ context/
+│  │  ├─ hooks/
 │  │  ├─ layouts/
-|  |  ├─ hooks/
 │  │  ├─ pages/
 │  │  ├─ routes/
 │  │  ├─ services/
