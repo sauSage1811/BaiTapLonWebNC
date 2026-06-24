@@ -60,33 +60,35 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="dashboard-section animate-in">
-                <div className="dashboard-section-title">⚡ Thao tác nhanh</div>
-                <div className="quick-actions">
-                    <Link to="/categories" className="quick-action-card">
-                        <div className="quick-action-icon">📋</div>
-                        <div>
-                            <div className="quick-action-text">Quản lý danh mục</div>
-                            <div className="quick-action-desc">Thêm, sửa, xóa danh mục</div>
-                        </div>
-                    </Link>
-                    <Link to="/products" className="quick-action-card">
-                        <div className="quick-action-icon">☕</div>
-                        <div>
-                            <div className="quick-action-text">Quản lý sản phẩm</div>
-                            <div className="quick-action-desc">Xem và cập nhật sản phẩm</div>
-                        </div>
-                    </Link>
-                    <Link to="/tables" className="quick-action-card">
-                        <div className="quick-action-icon">🪑</div>
-                        <div>
-                            <div className="quick-action-text">Quản lý bàn</div>
-                            <div className="quick-action-desc">Trạng thái bàn trong quán</div>
-                        </div>
-                    </Link>
+            {/* Quick Actions - Admin Only */}
+            {user?.role === "admin" && (
+                <div className="dashboard-section animate-in">
+                    <div className="dashboard-section-title">⚡ Thao tác nhanh</div>
+                    <div className="quick-actions">
+                        <Link to="/categories" className="quick-action-card">
+                            <div className="quick-action-icon">📋</div>
+                            <div>
+                                <div className="quick-action-text">Quản lý danh mục</div>
+                                <div className="quick-action-desc">Thêm, sửa, xóa danh mục</div>
+                            </div>
+                        </Link>
+                        <Link to="/products" className="quick-action-card">
+                            <div className="quick-action-icon">☕</div>
+                            <div>
+                                <div className="quick-action-text">Quản lý sản phẩm</div>
+                                <div className="quick-action-desc">Xem và cập nhật sản phẩm</div>
+                            </div>
+                        </Link>
+                        <Link to="/tables" className="quick-action-card">
+                            <div className="quick-action-icon">🪑</div>
+                            <div>
+                                <div className="quick-action-text">Quản lý bàn</div>
+                                <div className="quick-action-desc">Trạng thái bàn trong quán</div>
+                            </div>
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* User Info Card */}
             <div className="dashboard-section animate-in">
@@ -95,6 +97,9 @@ function Dashboard() {
                     <p>🏷️ Họ tên: {user?.full_name}</p>
                     <p>🔑 Tài khoản: {user?.username}</p>
                     <p>🛡️ Vai trò: {user?.role}</p>
+                    <button className="btn-logout" onClick={handleLogout}>
+                        🚪 Đăng xuất
+                    </button>
                 </div>
             </div>
         </div>

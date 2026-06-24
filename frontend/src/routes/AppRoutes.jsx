@@ -20,6 +20,20 @@ function PrivateRoute({ children }) {
     return children;
 }
 
+function AdminRoute({ children }) {
+    const { user } = useContext(AuthContext);
+
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
+
+    if (user.role !== "admin") {
+        return <Navigate to="/dashboard" />;
+    }
+
+    return children;
+}
+
 function ProtectedLayout({ children }) {
     return (
         <PrivateRoute>
@@ -47,27 +61,33 @@ function AppRoutes() {
             <Route
                 path="/categories"
                 element={
-                    <ProtectedLayout>
-                        <CategoryPage />
-                    </ProtectedLayout>
+                    <AdminRoute>
+                        <ProtectedLayout>
+                            <CategoryPage />
+                        </ProtectedLayout>
+                    </AdminRoute>
                 }
             />
 
             <Route
                 path="/products"
                 element={
-                    <ProtectedLayout>
-                        <ProductPage />
-                    </ProtectedLayout>
+                    <AdminRoute>
+                        <ProtectedLayout>
+                            <ProductPage />
+                        </ProtectedLayout>
+                    </AdminRoute>
                 }
             />
 
             <Route
                 path="/tables"
                 element={
-                    <ProtectedLayout>
-                        <TablePage />
-                    </ProtectedLayout>
+                    <AdminRoute>
+                        <ProtectedLayout>
+                            <TablePage />
+                        </ProtectedLayout>
+                    </AdminRoute>
                 }
             />
 

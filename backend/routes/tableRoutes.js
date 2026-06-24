@@ -2,12 +2,17 @@ const express = require("express");
 const router = express.Router();
 
 const tableController = require("../controllers/tableController");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-router.get("/", tableController.index);
-router.post("/", tableController.store);
-router.get("/:id", tableController.show);
-router.put("/:id", tableController.update);
-router.put("/:id/status", tableController.updateStatus);
-router.delete("/:id", tableController.destroy);
+// Everyone can read
+router.get("/", authMiddleware, tableController.index);
+router.get("/:id", authMiddleware, tableController.show);
+
+// Only admin can create/update/delete
+router.post("/", authMiddleware, roleMiddleware("admin"), tableController.store);
+router.put("/:id", authMiddleware, roleMiddleware("admin"), tableController.update);
+router.put("/:id/status", authMiddleware, tableController.updateStatus);
+router.delete("/:id", authMiddleware, roleMiddleware("admin"), tableController.destroy);
 
 module.exports = router;
