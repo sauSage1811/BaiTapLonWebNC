@@ -8,7 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const tableRoutes = require("./routes/tableRoutes");
 //
 const createOrderRoute  = require("./routes/createOrderRoute");
-const addItemRoute       = require("./routes/addItemRoute");
+const addItemRoute      = require("./routes/addItemRoute");
+const payOrderRoute     = require("./routes/payOrderRoute");
 
 const app = express();
 const port = 3000;
@@ -47,7 +48,7 @@ app.use("/api/auth", authRoutes);
 //
 app.use("/api/orders", createOrderRoute);
 app.use("/api/orders", addItemRoute);
-
+app.use("/api/orders", payOrderRoute);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
