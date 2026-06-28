@@ -13,11 +13,11 @@ async function createOrder(req, res) {
         }
 
         const result = await createOrderModel.insertNewOrder(table_id, user_id);
-        await createOrderModel.updateTableStatus(table_id, 'occupied');
+        await createOrderModel.updateTableStatus(table_id, 'using');
 
         res.status(201).json({ 
             success: true, 
-            message: "Tạo đơn thành công & Bàn chuyển sang 'occupied'!", 
+            message: "Tạo đơn thành công & Bàn chuyển sang 'using'!", 
             order_id: result.lastID 
         });
     } catch (err) {

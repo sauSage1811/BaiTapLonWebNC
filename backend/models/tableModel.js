@@ -1,8 +1,45 @@
 const db = require("../config/db");
 
+const VALID_TABLE_STATUSES = ['empty', 'using', 'maintenance'];
+
+const TABLE_SELECT = `
+    SELECT
+        id,
+        name,
+        name AS tableNumber,
+        capacity,
+        floor,
+        area,
+        status,
+        use_time AS useTime,
+        created_at
+    FROM tables
+`;
+
+function normalizeTableData(data) {
+    return {
+        name: data.name,
+        capacity: data.capacity || '2-4',
+        floor: data.floor || 'Tầng 1',
+        area: data.area || 'Khu trong nhà',
+        status: data.status || 'empty',
+        useTime: data.useTime || data.use_time || null
+    };
+}
+
+function validateStatus(status) {
+    return VALID_TABLE_STATUSES.includes(status);
+}
+
+function createValidationError(message) {
+    const error = new Error(message);
+    error.statusCode = 400;
+    return error;
+}
+
 function getAllTables(callback) {
     const sql = `
-        SELECT * FROM tables
+        ${TABLE_SELECT}
         ORDER BY id ASC
     `;
 
@@ -11,44 +48,83 @@ function getAllTables(callback) {
 
 function getTableById(id, callback) {
     const sql = `
-        SELECT * FROM tables WHERE id = ?
+        ${TABLE_SELECT}
+        WHERE id = ?
     `;
 
     db.get(sql, [id], callback);
 }
 
-function createTable(name, callback) {
+function createTable(data, callback) {
+    const table = normalizeTableData(data);
+
+    if (!validateStatus(table.status)) {
+        return callback(createValidationError('Trạng thái không hợp lệ. Phải là: empty, using, maintenance'));
+    }
+
     const sql = `
-        INSERT INTO tables (name, status)
-        VALUES (?, 'empty')
+        INSERT INTO tables (name, capacity, floor, area, status, use_time)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.run(sql, [name], function(err) {
+    const params = [
+        table.name,
+        table.capacity,
+        table.floor,
+        table.area,
+        table.status,
+        table.useTime
+    ];
+
+    db.run(sql, params, function(err) {
         if (err) {
             return callback(err);
         }
-        callback(null, { id: this.lastID, name, status: 'empty' });
+
+        getTableById(this.lastID, callback);
     });
 }
 
-function updateTable(id, name, callback) {
+function updateTable(id, data, callback) {
+    const table = normalizeTableData(data);
+
+    if (!validateStatus(table.status)) {
+        return callback(createValidationError('Trạng thái không hợp lệ. Phải là: empty, using, maintenance'));
+    }
+
     const sql = `
-        UPDATE tables SET name = ? WHERE id = ?
+        UPDATE tables
+        SET name = ?,
+            capacity = ?,
+            floor = ?,
+            area = ?,
+            status = ?,
+            use_time = ?
+        WHERE id = ?
     `;
 
-    db.run(sql, [name, id], function(err) {
+    const params = [
+        table.name,
+        table.capacity,
+        table.floor,
+        table.area,
+        table.status,
+        table.useTime,
+        id
+    ];
+
+    db.run(sql, params, function(err) {
         if (err) {
             return callback(err);
         }
-        callback(null, { id, name });
+
+        getTableById(id, callback);
     });
 }
 
 function updateTableStatus(id, status, callback) {
-    const validStatuses = ['empty', 'occupied', 'reserved'];
-    
-    if (!validStatuses.includes(status)) {
-        return callback(new Error('Trạng thái không hợp lệ. Phải là: empty, occupied, reserved'));
+    if (!validateStatus(status)) {
+        return callback(createValidationError('Trạng thái không hợp lệ. Phải là: empty, using, maintenance'));
     }
 
     const sql = `
@@ -59,7 +135,8 @@ function updateTableStatus(id, status, callback) {
         if (err) {
             return callback(err);
         }
-        callback(null, { id, status });
+
+        getTableById(id, callback);
     });
 }
 
@@ -77,6 +154,7 @@ function deleteTable(id, callback) {
 }
 
 module.exports = {
+    VALID_TABLE_STATUSES,
     getAllTables,
     getTableById,
     createTable,

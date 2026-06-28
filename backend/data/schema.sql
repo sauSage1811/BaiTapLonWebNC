@@ -43,7 +43,11 @@ CREATE TABLE products (
 CREATE TABLE tables (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    capacity TEXT NOT NULL DEFAULT '2-4',
+    floor TEXT NOT NULL DEFAULT 'Tầng 1',
+    area TEXT NOT NULL DEFAULT 'Khu trong nhà',
     status TEXT NOT NULL DEFAULT 'empty',
+    use_time TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
