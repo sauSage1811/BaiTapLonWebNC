@@ -19,7 +19,7 @@ function CategoryPage() {
                     <p>Quản lý danh mục đồ uống: cafe, trà, nước ép...</p>
                 </div>
                 <button className="btn btn-primary">
-                    ➕ Thêm danh mục
+                    <span className="btn-plus-icon">+</span> Thêm danh mục
                 </button>
             </div>
 
