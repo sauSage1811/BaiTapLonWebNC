@@ -602,10 +602,13 @@ a {
 }
 
 .sidebar a .nav-icon {
-    font-size: 18px;
     width: 24px;
-    text-align: center;
+    height: 24px;
     flex-shrink: 0;
+    object-fit: contain;
+    opacity: 0.65;
+    filter: brightness(0) invert(1);
+    transition: opacity var(--transition-fast);
 }
 
 .sidebar a .nav-label {
@@ -628,7 +631,8 @@ a {
 }
 
 .sidebar.collapsed a .nav-icon {
-    width: auto;
+    width: 24px;
+    height: 24px;
 }
 
 .sidebar.collapsed a .nav-label {
@@ -666,6 +670,11 @@ a {
     color: var(--white);
     box-shadow: 0 4px 15px rgba(160, 118, 67, 0.35);
     font-weight: 600;
+}
+
+.sidebar a:hover .nav-icon,
+.sidebar a.active .nav-icon {
+    opacity: 1;
 }
 
 /* Sidebar footer */
@@ -1158,10 +1167,22 @@ a {
     border-radius: var(--border-radius-sm);
 }
 
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%);
+}
+
 .btn-edit {
     background: var(--cream-300);
     color: var(--coffee-600);
     border: 1px solid var(--cream-500);
+}
+
+.btn-edit .btn-icon {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(20%) saturate(1294%) hue-rotate(342deg) brightness(91%) contrast(86%);
 }
 
 .btn-edit:hover {
@@ -1170,10 +1191,18 @@ a {
     color: var(--caramel-600);
 }
 
+.btn-edit:hover .btn-icon {
+    filter: brightness(0) saturate(100%) invert(45%) sepia(16%) saturate(1617%) hue-rotate(355deg) brightness(93%) contrast(87%);
+}
+
 .btn-delete {
     background: var(--danger-bg);
     color: var(--danger-text);
     border: 1px solid var(--danger-border);
+}
+
+.btn-delete .btn-icon {
+    filter: brightness(0) saturate(100%) invert(23%) sepia(93%) saturate(1811%) hue-rotate(338deg) brightness(90%) contrast(88%);
 }
 
 .btn-delete:hover {
