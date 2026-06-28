@@ -25,7 +25,7 @@ function Dashboard() {
                         <div className="stat-card-icon">☕</div>
                     </div>
                     <div className="stat-card-value">24</div>
-                    <div className="stat-card-label">Tổng sản phẩm</div>
+                    <div className="stat-card-label">Tổng món</div>
                 </div>
 
                 <div className="stat-card animate-in">
@@ -67,8 +67,8 @@ function Dashboard() {
                         <Link to="/products" className="quick-action-card">
                             <div className="quick-action-icon">☕</div>
                             <div>
-                                <div className="quick-action-text">Quản lý sản phẩm</div>
-                                <div className="quick-action-desc">Xem và cập nhật sản phẩm</div>
+                                <div className="quick-action-text">Quản lý menu</div>
+                                <div className="quick-action-desc">Xem và cập nhật món</div>
                             </div>
                         </Link>
                         <Link to="/tables" className="quick-action-card">

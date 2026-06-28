@@ -10,7 +10,7 @@ import logoutIcon from "../assets/icons/logout.svg";
 const adminMenuItems = [
     { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
     { to: "/categories", icon: categoryIcon, label: "Danh mục" },
-    { to: "/products", icon: productIcon, label: "Sản phẩm" },
+    { to: "/products", icon: productIcon, label: "Menu" },
     { to: "/tables", icon: tableIcon, label: "Bàn" },
 ];
 

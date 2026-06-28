@@ -48,7 +48,7 @@ function TablePage() {
                     <p>Quản lý các bàn, sức chứa, tầng và trạng thái bàn.</p>
                 </div>
                 <button className="btn btn-primary">
-                    ➕ Thêm bàn
+                    <span className="btn-plus-icon">+</span> Thêm bàn
                 </button>
             </div>
 
