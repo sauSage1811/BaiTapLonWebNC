@@ -2,12 +2,7 @@ import { useAuth } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 
 function Dashboard() {
-    const { user, logout } = useAuth();
-
-    const handleLogout = async () => {
-        await logout();
-        window.location.href = "/login";
-    };
+    const { user } = useAuth();
 
     const today = new Date().toLocaleDateString("vi-VN", {
         weekday: "long",
@@ -18,14 +13,12 @@ function Dashboard() {
 
     return (
         <div className="dashboard-page">
-            {/* Welcome Banner */}
             <div className="dashboard-welcome animate-in">
                 <h1>👋 Xin chào, {user?.full_name || "Admin"}!</h1>
                 <p>Chào mừng bạn quay lại hệ thống quản lý Coffee Management.</p>
                 <div className="welcome-date">📅 {today}</div>
             </div>
 
-            {/* Stats Cards */}
             <div className="dashboard-stats">
                 <div className="stat-card animate-in">
                     <div className="stat-card-header">
@@ -60,7 +53,6 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Quick Actions - Admin Only */}
             {user?.role === "admin" && (
                 <div className="dashboard-section animate-in">
                     <div className="dashboard-section-title">⚡ Thao tác nhanh</div>
@@ -90,16 +82,12 @@ function Dashboard() {
                 </div>
             )}
 
-            {/* User Info Card */}
             <div className="dashboard-section animate-in">
                 <div className="dashboard-section-title">👤 Thông tin tài khoản</div>
                 <div className="user-card">
                     <p>🏷️ Họ tên: {user?.full_name}</p>
                     <p>🔑 Tài khoản: {user?.username}</p>
                     <p>🛡️ Vai trò: {user?.role}</p>
-                    <button className="btn-logout" onClick={handleLogout}>
-                        🚪 Đăng xuất
-                    </button>
                 </div>
             </div>
         </div>
