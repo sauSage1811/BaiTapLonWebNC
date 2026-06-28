@@ -1,16 +1,20 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import logoImg from "../assets/logo.png";
+import dashboardIcon from "../assets/icons/dashboard.svg";
+import categoryIcon from "../assets/icons/category.svg";
+import productIcon from "../assets/icons/product.svg";
+import tableIcon from "../assets/icons/table.svg";
 
 const adminMenuItems = [
-    { to: "/dashboard", icon: "\ud83d\udcca", label: "Dashboard" },
-    { to: "/categories", icon: "\ud83d\udccb", label: "Danh m\u1ee5c" },
-    { to: "/products", icon: "\u2615", label: "S\u1ea3n ph\u1ea9m" },
-    { to: "/tables", icon: "\ud83e\ude91", label: "B\u00e0n" },
+    { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
+    { to: "/categories", icon: categoryIcon, label: "Danh m\u1ee5c" },
+    { to: "/products", icon: productIcon, label: "S\u1ea3n ph\u1ea9m" },
+    { to: "/tables", icon: tableIcon, label: "B\u00e0n" },
 ];
 
 const staffMenuItems = [
-    { to: "/dashboard", icon: "\ud83d\udcca", label: "Dashboard" },
+    { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
 ];
 
 function Sidebar({ collapsed, onToggle }) {
@@ -48,7 +52,12 @@ function Sidebar({ collapsed, onToggle }) {
                         to={item.to} 
                         title={item.label}
                     >
-                        <span className="nav-icon" aria-hidden="true">{item.icon}</span>
+                        <img
+                            className="nav-icon"
+                            src={item.icon}
+                            alt=""
+                            aria-hidden="true"
+                        />
                         <span className="nav-label">{item.label}</span>
                     </NavLink>
                 ))}

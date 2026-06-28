@@ -1,5 +1,7 @@
+import editIcon from "../assets/icons/edit.svg";
+import deleteIcon from "../assets/icons/delete.svg";
+
 function CategoryPage() {
-    // Dữ liệu mẫu cho UI
     const sampleCategories = [
         { id: 1, name: "Cà phê", description: "Các loại cà phê truyền thống và hiện đại" },
         { id: 2, name: "Trà", description: "Trà nóng, trà đá, trà sữa các loại" },
@@ -11,7 +13,6 @@ function CategoryPage() {
 
     return (
         <div>
-            {/* Page Header */}
             <div className="page-header">
                 <div className="page-header-text">
                     <h1>📋 Quản lý danh mục</h1>
@@ -22,7 +23,6 @@ function CategoryPage() {
                 </button>
             </div>
 
-            {/* Table Card */}
             <div className="card animate-in">
                 <div className="card-header">
                     <h2>Danh sách danh mục ({sampleCategories.length})</h2>
@@ -42,15 +42,21 @@ function CategoryPage() {
                                 <tr key={cat.id}>
                                     <td className="col-stt">{index + 1}</td>
                                     <td>
-                                        <span style={{ fontWeight: 600, color: '#3f2a1d' }}>
+                                        <span style={{ fontWeight: 600, color: "#3f2a1d" }}>
                                             {cat.name}
                                         </span>
                                     </td>
                                     <td>{cat.description}</td>
                                     <td>
                                         <div className="table-actions">
-                                            <button className="btn btn-sm btn-edit">✏️ Sửa</button>
-                                            <button className="btn btn-sm btn-delete">🗑️ Xóa</button>
+                                            <button className="btn btn-sm btn-edit">
+                                                <img src={editIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Sửa
+                                            </button>
+                                            <button className="btn btn-sm btn-delete">
+                                                <img src={deleteIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Xóa
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

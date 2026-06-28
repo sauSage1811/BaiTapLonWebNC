@@ -1,5 +1,7 @@
+import editIcon from "../assets/icons/edit.svg";
+import deleteIcon from "../assets/icons/delete.svg";
+
 function TablePage() {
-    // Dữ liệu mẫu cho bàn
     const sampleTables = [
         { id: 1, tableNumber: "01", capacity: 2, status: "available", floor: "Tầng 1" },
         { id: 2, tableNumber: "02", capacity: 2, status: "occupied", floor: "Tầng 1" },
@@ -39,7 +41,6 @@ function TablePage() {
 
     return (
         <div>
-            {/* Page Header */}
             <div className="page-header">
                 <div className="page-header-text">
                     <h1>🪑 Quản lý bàn</h1>
@@ -50,7 +51,6 @@ function TablePage() {
                 </button>
             </div>
 
-            {/* Toolbar: Search and Filters */}
             <div className="page-toolbar">
                 <div className="page-toolbar-left">
                     <div className="search-bar">
@@ -62,13 +62,12 @@ function TablePage() {
                     </div>
                 </div>
                 <div className="page-toolbar-right">
-                    <span style={{ fontSize: 13, color: '#78716c', fontWeight: 500 }}>
+                    <span style={{ fontSize: 13, color: "#78716c", fontWeight: 500 }}>
                         Tổng: {sampleTables.length} bàn
                     </span>
                 </div>
             </div>
 
-            {/* Table Card */}
             <div className="card animate-in">
                 <div className="card-body">
                     <table className="data-table">
@@ -102,8 +101,14 @@ function TablePage() {
                                     </td>
                                     <td>
                                         <div className="table-actions">
-                                            <button className="btn btn-sm btn-edit">✏️ Sửa</button>
-                                            <button className="btn btn-sm btn-delete">🗑️ Xóa</button>
+                                            <button className="btn btn-sm btn-edit">
+                                                <img src={editIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Sửa
+                                            </button>
+                                            <button className="btn btn-sm btn-delete">
+                                                <img src={deleteIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Xóa
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

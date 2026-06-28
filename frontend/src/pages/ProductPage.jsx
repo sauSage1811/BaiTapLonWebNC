@@ -1,5 +1,7 @@
+import editIcon from "../assets/icons/edit.svg";
+import deleteIcon from "../assets/icons/delete.svg";
+
 function ProductPage() {
-    // Dữ liệu mẫu cho UI
     const sampleProducts = [
         { id: 1, name: "Cà phê sữa đá", price: 29000, category: "Cà phê", active: true },
         { id: 2, name: "Cà phê đen", price: 25000, category: "Cà phê", active: true },
@@ -20,7 +22,6 @@ function ProductPage() {
 
     return (
         <div>
-            {/* Page Header */}
             <div className="page-header">
                 <div className="page-header-text">
                     <h1>☕ Quản lý sản phẩm</h1>
@@ -31,7 +32,6 @@ function ProductPage() {
                 </button>
             </div>
 
-            {/* Toolbar: Search */}
             <div className="page-toolbar">
                 <div className="page-toolbar-left">
                     <div className="search-bar">
@@ -43,13 +43,12 @@ function ProductPage() {
                     </div>
                 </div>
                 <div className="page-toolbar-right">
-                    <span style={{ fontSize: 13, color: '#78716c', fontWeight: 500 }}>
+                    <span style={{ fontSize: 13, color: "#78716c", fontWeight: 500 }}>
                         Tổng: {sampleProducts.length} sản phẩm
                     </span>
                 </div>
             </div>
 
-            {/* Table Card */}
             <div className="card animate-in">
                 <div className="card-body">
                     <table className="data-table">
@@ -78,13 +77,19 @@ function ProductPage() {
                                     </td>
                                     <td>
                                         <span className={`badge ${product.active ? "badge-active" : "badge-inactive"}`}>
-                                            {product.active ? "✓ Active" : "✗ Inactive"}
+                                            {product.active ? "✓ Active" : "✕ Inactive"}
                                         </span>
                                     </td>
                                     <td>
                                         <div className="table-actions">
-                                            <button className="btn btn-sm btn-edit">✏️ Sửa</button>
-                                            <button className="btn btn-sm btn-delete">🗑️ Xóa</button>
+                                            <button className="btn btn-sm btn-edit">
+                                                <img src={editIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Sửa
+                                            </button>
+                                            <button className="btn btn-sm btn-delete">
+                                                <img src={deleteIcon} alt="" className="btn-icon" aria-hidden="true" />
+                                                Xóa
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
