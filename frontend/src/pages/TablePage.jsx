@@ -1,5 +1,6 @@
 import editIcon from "../assets/icons/edit.svg";
 import deleteIcon from "../assets/icons/delete.svg";
+import searchIcon from "../assets/icons/search.svg";
 
 function TablePage() {
     const sampleTables = [
@@ -54,7 +55,7 @@ function TablePage() {
             <div className="page-toolbar">
                 <div className="page-toolbar-left">
                     <div className="search-bar">
-                        <span className="search-bar-icon">🔍</span>
+                        <img src={searchIcon} alt="" className="search-bar-icon" aria-hidden="true" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm bàn..."
