@@ -22,14 +22,19 @@ VALUES
 ('Bánh ngọt', 20000, 4, NULL, 'active'),
 ('Trân châu', 5000, 5, NULL, 'active');
 
-INSERT INTO tables (name, status)
+INSERT INTO tables (name, capacity, floor, area, status, use_time)
 VALUES
-('Bàn 1', 'empty'),
-('Bàn 2', 'empty'),
-('Bàn 3', 'empty'),
-('Bàn 4', 'empty'),
-('Bàn 5', 'empty'),
-('Mang về', 'empty');
+('Bàn T01', '2-4', 'Tầng 1', 'Khu trong nhà', 'empty', NULL),
+('Bàn T02', '2-4', 'Tầng 1', 'Khu trong nhà', 'using', '00:45:12'),
+('Bàn T03', '4-6', 'Tầng 1', 'Khu trong nhà', 'empty', NULL),
+('Bàn T04', '2-4', 'Tầng 1', 'Khu trong nhà', 'maintenance', NULL),
+('Bàn T05', '4-6', 'Tầng 1', 'Khu trong nhà', 'empty', NULL),
+('Bàn T06', '2-4', 'Tầng 1', 'Khu trong nhà', 'using', '01:12:08'),
+('Bàn T07', '6-8', 'Tầng 1', 'Khu trong nhà', 'empty', NULL),
+('Bàn T08', '2-4', 'Tầng 1', 'Khu trong nhà', 'maintenance', NULL),
+('Bàn T09', '2-4', 'Tầng 2', 'Khu ban công', 'empty', NULL),
+('Bàn T10', '4-6', 'Tầng 2', 'Khu ban công', 'empty', NULL),
+('Bàn T11', '2-4', 'Tầng 2', 'Khu ban công', 'using', '00:22:35');
 
 INSERT INTO orders (table_id, user_id, total_amount, status)
 VALUES
