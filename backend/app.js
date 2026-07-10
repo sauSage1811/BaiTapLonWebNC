@@ -11,6 +11,8 @@ const createOrderRoute  = require("./routes/createOrderRoute");
 const addItemRoute      = require("./routes/addItemRoute");
 const payOrderRoute     = require("./routes/payOrderRoute");
 const searchProductRoute = require("./routes/searchProductRoute");
+const revenueRoute       = require("./routes/revenueRoute");
+
 const app = express();
 const port = 3000;
 
@@ -50,6 +52,8 @@ app.use("/api/orders", createOrderRoute);
 app.use("/api/orders", addItemRoute);
 app.use("/api/orders", payOrderRoute);
 app.use("/api/search", searchProductRoute);
+app.use("/api/analytics", revenueRoute);
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
