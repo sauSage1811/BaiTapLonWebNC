@@ -13,7 +13,7 @@ function CreateOrderPage() {
         const fetchTables = async () => {
             try {
                 const response = await api.get("/tables");
-                // Lọc những bàn đang trống (hoặc hiển thị hết tùy bri)
+                // Lọc những bàn đang trống (hoặc hiển thị hết )
                 const availableTables = response.data.data.filter(t => t.status === "empty" || t.status === "active");
                 setTables(availableTables);
             } catch (err) {
@@ -119,7 +119,7 @@ function CreateOrderPage() {
                         cursor: loading ? "not-allowed" : "pointer" 
                     }}
                 >
-                    {loading ? "Đang xử lý..." : "🚀 Khởi Tạo Hóa Đơn & Mở Bàn"}
+                    {loading ? "Đang xử lý..." : " Khởi Tạo Hóa Đơn & Mở Bàn"}
                 </button>
             </form>
         </div>
