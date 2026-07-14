@@ -13,7 +13,11 @@ import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
 
 function PrivateRoute({ children }) {
-    const { user } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
+
+    if (loading) {
+        return null;
+    }
 
     if (!user) {
         return <Navigate to="/login" />;
@@ -23,7 +27,11 @@ function PrivateRoute({ children }) {
 }
 
 function AdminRoute({ children }) {
-    const { user } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
+
+    if (loading) {
+        return null;
+    }
 
     if (!user) {
         return <Navigate to="/login" />;

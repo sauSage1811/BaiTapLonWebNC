@@ -57,8 +57,8 @@ function ForgotPassword() {
             return;
         }
 
-        if (formData.newPassword.length < 6) {
-            setError("Mật khẩu phải có ít nhất 6 ký tự");
+        if (!/[A-Za-z]/.test(formData.newPassword) || !/\d/.test(formData.newPassword) || formData.newPassword.length < 8) {
+            setError("Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ cái và chữ số");
             setLoading(false);
             return;
         }
@@ -180,7 +180,7 @@ function ForgotPassword() {
                                 name="newPassword"
                                 value={formData.newPassword}
                                 onChange={handleInputChange}
-                                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                                placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự, có chữ và số)"
                                 required
                             />
                         </div>

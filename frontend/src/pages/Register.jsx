@@ -49,9 +49,8 @@ function Register() {
             return;
         }
 
-        // Kiểm tra password
-        if (formData.password.length < 6) {
-            setError("Mật khẩu phải có ít nhất 6 ký tự");
+        if (!/[A-Za-z]/.test(formData.password) || !/\d/.test(formData.password) || formData.password.length < 8) {
+            setError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái và chữ số");
             setLoading(false);
             return;
         }
@@ -135,7 +134,7 @@ function Register() {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                            placeholder="Nhập mật khẩu (tối thiểu 8 ký tự, có chữ và số)"
                             required
                         />
                     </div>

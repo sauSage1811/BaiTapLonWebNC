@@ -1,8 +1,17 @@
-import { useAuth } from "../hooks/useAuth";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import api from "../services/api";
 
 function Dashboard() {
     const { user } = useAuth();
+    const [stats, setStats] = useState({
+        products: null,
+        categories: null,
+        tables: null
+    });
+    const [statsLoading, setStatsLoading] = useState(true);
+    const [statsError, setStatsError] = useState("");
 
     const today = new Date().toLocaleDateString("vi-VN", {
         weekday: "long",
@@ -10,6 +19,58 @@ function Dashboard() {
         month: "long",
         day: "numeric",
     });
+
+    useEffect(() => {
+        let ignore = false;
+        const requests = [
+            ["products", "/products"],
+            ["categories", "/categories"],
+            ["tables", "/tables"]
+        ];
+
+        setStatsLoading(true);
+        setStatsError("");
+
+        Promise.allSettled(requests.map(([, url]) => api.get(url)))
+            .then((results) => {
+                if (ignore) return;
+
+                let hasError = false;
+                const nextStats = {};
+
+                results.forEach((result, index) => {
+                    const key = requests[index][0];
+
+                    if (result.status === "fulfilled") {
+                        const data = result.value.data?.data;
+                        nextStats[key] = Array.isArray(data) ? data.length : 0;
+                    } else {
+                        hasError = true;
+                        nextStats[key] = 0;
+                    }
+                });
+
+                setStats(nextStats);
+                setStatsError(hasError ? "Không tải được đầy đủ số liệu dashboard" : "");
+            })
+            .finally(() => {
+                if (!ignore) {
+                    setStatsLoading(false);
+                }
+            });
+
+        return () => {
+            ignore = true;
+        };
+    }, []);
+
+    const formatStat = (value) => {
+        if (statsLoading && value === null) {
+            return "...";
+        }
+
+        return value ?? 0;
+    };
 
     return (
         <div className="dashboard-page">
@@ -19,12 +80,14 @@ function Dashboard() {
                 <div className="welcome-date">📅 {today}</div>
             </div>
 
+            {statsError && <div className="error-message">{statsError}</div>}
+
             <div className="dashboard-stats">
                 <div className="stat-card animate-in">
                     <div className="stat-card-header">
                         <div className="stat-card-icon">☕</div>
                     </div>
-                    <div className="stat-card-value">24</div>
+                    <div className="stat-card-value">{formatStat(stats.products)}</div>
                     <div className="stat-card-label">Tổng món</div>
                 </div>
 
@@ -32,7 +95,7 @@ function Dashboard() {
                     <div className="stat-card-header">
                         <div className="stat-card-icon">📋</div>
                     </div>
-                    <div className="stat-card-value">6</div>
+                    <div className="stat-card-value">{formatStat(stats.categories)}</div>
                     <div className="stat-card-label">Tổng danh mục</div>
                 </div>
 
@@ -40,7 +103,7 @@ function Dashboard() {
                     <div className="stat-card-header">
                         <div className="stat-card-icon">🪑</div>
                     </div>
-                    <div className="stat-card-value">12</div>
+                    <div className="stat-card-value">{formatStat(stats.tables)}</div>
                     <div className="stat-card-label">Tổng số bàn</div>
                 </div>
 
@@ -48,7 +111,7 @@ function Dashboard() {
                     <div className="stat-card-header">
                         <div className="stat-card-icon">✅</div>
                     </div>
-                    <div className="stat-card-value">Online</div>
+                    <div className="stat-card-value">{statsError ? "Offline" : "Online"}</div>
                     <div className="stat-card-label">Trạng thái hệ thống</div>
                 </div>
             </div>
