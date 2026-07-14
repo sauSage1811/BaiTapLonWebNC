@@ -88,6 +88,7 @@ async function login(req, res) {
     }
 
     try {
+        console.log("[LOGIN] Step 1: finding user", normalizedUsername);
         const user = await userModel.findUserByUsername(normalizedUsername);
 
         if (!user) {
@@ -97,6 +98,8 @@ async function login(req, res) {
             });
         }
 
+        console.log("[LOGIN] Step 2: found user, status:", user.status);
+
         if (user.status !== "active") {
             return res.status(403).json({
                 success: false,
@@ -104,7 +107,9 @@ async function login(req, res) {
             });
         }
 
+        console.log("[LOGIN] Step 3: verifying password");
         const passwordValid = await verifyPassword(String(password), user.password);
+        console.log("[LOGIN] Step 4: password valid:", passwordValid);
 
         if (!passwordValid) {
             return res.status(401).json({
@@ -114,10 +119,12 @@ async function login(req, res) {
         }
 
         if (!isBcryptHash(user.password)) {
+            console.log("[LOGIN] Step 5: upgrading legacy password");
             const hashedPassword = await bcrypt.hash(String(password), SALT_ROUNDS);
             await userModel.updatePassword(normalizedUsername, hashedPassword);
         }
 
+        console.log("[LOGIN] Step 6: signing JWT, secret defined:", !!JWT_SECRET);
         const token = jwt.sign(
             {
                 id: user.id,
@@ -130,13 +137,16 @@ async function login(req, res) {
             }
         );
 
+        console.log("[LOGIN] Step 7: sending response");
         res.json({
             success: true,
             message: "Đăng nhập thành công",
             token,
             user: sanitizeUser(user)
         });
+        console.log("[LOGIN] Step 8: response sent OK");
     } catch (error) {
+        console.error("[LOGIN] CAUGHT ERROR:", error);
         res.status(500).json({
             success: false,
             message: "Không thể xử lý đăng nhập lúc này"
