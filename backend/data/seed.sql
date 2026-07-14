@@ -1,7 +1,7 @@
 INSERT INTO users (full_name, username, password, role, status, security_question, security_answer)
 VALUES
-('Quản trị viên', 'admin', '123456', 'admin', 'active', 'Tên quán cafe của bạn là gì?', 'cafe pka'),
-('Nhân viên bán hàng', 'staff', '123456', 'staff', 'active', 'Thành phố bạn sống là gì?', 'ho chi minh');
+('Quản trị viên', 'admin', '$2b$12$T.s4loLS.mLHQpbB0VieReIzhRjF6SXjQtU7b1sRGrXlHxj8KWxnS', 'admin', 'active', 'Tên quán cafe của bạn là gì?', '$2b$12$O1dOcLTWs2BXuneVAtVtuuC/Qy3rbm0VpzHvj92RoWe8SsbP5KbfS'),
+('Nhân viên bán hàng', 'staff', '$2b$12$T.s4loLS.mLHQpbB0VieReIzhRjF6SXjQtU7b1sRGrXlHxj8KWxnS', 'staff', 'active', 'Thành phố bạn sống là gì?', '$2b$12$O1dOcLTWs2BXuneVAtVtuuC/Qy3rbm0VpzHvj92RoWe8SsbP5KbfS');
 
 INSERT INTO categories (name, description)
 VALUES
