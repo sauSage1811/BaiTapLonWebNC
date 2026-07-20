@@ -36,10 +36,10 @@ VALUES
 ('Bàn T10', '4-6', 'Tầng 2', 'Khu ban công', 'empty', NULL),
 ('Bàn T11', '2-4', 'Tầng 2', 'Khu ban công', 'using', '00:22:35');
 
-INSERT INTO orders (table_id, user_id, total_amount, status)
+INSERT INTO orders (table_id, user_id, total_amount, status, paid_at)
 VALUES
-(1, 1, 50000, 'pending'),
-(2, 1, 75000, 'paid');
+(1, 1, 0, 'pending', NULL),
+(2, 1, 0, 'paid', CURRENT_TIMESTAMP);
 
 INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
 VALUES

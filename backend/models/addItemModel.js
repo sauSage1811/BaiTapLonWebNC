@@ -1,16 +1,5 @@
 const db = require('../config/db');
 
-db.run(`
-    CREATE TABLE IF NOT EXISTS order_details (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        quantity INTEGER NOT NULL,
-        price REAL NOT NULL,
-        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-    )
-`);
-
 function checkOrderPending(order_id) {
     return new Promise((resolve, reject) => {
         db.get('SELECT * FROM orders WHERE id = ? AND status = "pending"', [order_id], (err, row) => {
@@ -29,21 +18,45 @@ function getProductPrice(product_id) {
     });
 }
 
-function addOrderDetail(order_id, product_id, quantity, price) {
+function addOrderItem(order_id, product_id, quantity, price) {
+    const subtotal = quantity * price;
+
     return new Promise((resolve, reject) => {
-        db.run('INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)', 
-        [order_id, product_id, quantity, price], function(err) {
-            if (err) reject(err);
-            else resolve(this);
-        });
+        db.run(
+            'INSERT INTO order_items (order_id, product_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)',
+            [order_id, product_id, quantity, price, subtotal],
+            function(err) {
+                if (err) reject(err);
+                else resolve(this);
+            }
+        );
     });
 }
 
-function updateTotalAmount(order_id, amount) {
+function refreshOrderTotal(order_id) {
     return new Promise((resolve, reject) => {
-        db.run('UPDATE orders SET total_amount = total_amount + ? WHERE id = ?', [amount, order_id], function(err) {
+        db.run(
+            `UPDATE orders
+             SET total_amount = COALESCE((
+                SELECT SUM(subtotal)
+                FROM order_items
+                WHERE order_id = ?
+             ), 0)
+             WHERE id = ?`,
+            [order_id, order_id],
+            function(err) {
+                if (err) reject(err);
+                else resolve(this);
+            }
+        );
+    });
+}
+
+function getOrderItems(order_id) {
+    return new Promise((resolve, reject) => {
+        db.all('SELECT * FROM order_items WHERE order_id = ? ORDER BY id ASC', [order_id], (err, rows) => {
             if (err) reject(err);
-            else resolve(this);
+            else resolve(rows);
         });
     });
 }
@@ -51,6 +64,7 @@ function updateTotalAmount(order_id, amount) {
 module.exports = {
     checkOrderPending,
     getProductPrice,
-    addOrderDetail,
-    updateTotalAmount
+    addOrderItem,
+    refreshOrderTotal,
+    getOrderItems
 };

@@ -20,6 +20,36 @@ function getCategoryById(id, callback) {
     db.get(sql, [id], callback);
 }
 
+function getCategoryByName(name, excludeId, callback) {
+    const params = [name];
+    let excludeClause = "";
+
+    if (excludeId) {
+        excludeClause = "AND id != ?";
+        params.push(excludeId);
+    }
+
+    const sql = `
+        SELECT id, name, description, created_at
+        FROM categories
+        WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))
+        ${excludeClause}
+        LIMIT 1
+    `;
+
+    db.get(sql, params, callback);
+}
+
+function countProductsByCategory(id, callback) {
+    const sql = `
+        SELECT COUNT(*) AS count
+        FROM products
+        WHERE category_id = ?
+    `;
+
+    db.get(sql, [id], callback);
+}
+
 function createCategory(data, callback) {
     const sql = `
         INSERT INTO categories (name, description)
@@ -28,11 +58,12 @@ function createCategory(data, callback) {
 
     db.run(
         sql,
-        [data.name, data.description || null],
+        [data.name.trim(), data.description?.trim() || null],
         function (err) {
             callback(err, {
                 id: this?.lastID,
-                ...data
+                name: data.name.trim(),
+                description: data.description?.trim() || null
             });
         }
     );
@@ -47,11 +78,12 @@ function updateCategory(id, data, callback) {
 
     db.run(
         sql,
-        [data.name, data.description || null, id],
+        [data.name.trim(), data.description?.trim() || null, id],
         function (err) {
             callback(err, {
                 id,
-                ...data,
+                name: data.name.trim(),
+                description: data.description?.trim() || null,
                 changes: this?.changes
             });
         }
@@ -75,6 +107,8 @@ function deleteCategory(id, callback) {
 module.exports = {
     getAllCategories,
     getCategoryById,
+    getCategoryByName,
+    countProductsByCategory,
     createCategory,
     updateCategory,
     deleteCategory

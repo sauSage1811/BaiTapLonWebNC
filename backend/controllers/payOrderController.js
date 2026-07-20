@@ -7,7 +7,7 @@ async function payOrder(req, res) {
     }
 
     try {
-        const order = await payOrderModel.getOrderDetails(order_id);
+        const order = await payOrderModel.getOrderSummary(order_id);
         if (!order) {
             return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng!" });
         }
