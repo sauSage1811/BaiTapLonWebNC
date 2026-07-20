@@ -1,12 +1,34 @@
 const categoryModel = require("../models/categoryModel");
 
+function isValidId(id) {
+    return Number.isInteger(Number(id)) && Number(id) > 0;
+}
+
+function normalizeCategoryInput(body) {
+    return {
+        name: typeof body.name === "string" ? body.name.trim() : "",
+        description: typeof body.description === "string" ? body.description.trim() : ""
+    };
+}
+
+function sendSqlError(res, err) {
+    if (err && err.code === "SQLITE_CONSTRAINT") {
+        return res.status(409).json({
+            success: false,
+            message: "Tên danh mục đã tồn tại"
+        });
+    }
+
+    return res.status(500).json({
+        success: false,
+        message: err.message
+    });
+}
+
 function index(req, res) {
     categoryModel.getAllCategories((err, categories) => {
         if (err) {
-            return res.status(500).json({
-                success: false,
-                message: err.message
-            });
+            return sendSqlError(res, err);
         }
 
         res.json({
@@ -19,12 +41,16 @@ function index(req, res) {
 function show(req, res) {
     const id = req.params.id;
 
+    if (!isValidId(id)) {
+        return res.status(400).json({
+            success: false,
+            message: "ID danh mục không hợp lệ"
+        });
+    }
+
     categoryModel.getCategoryById(id, (err, category) => {
         if (err) {
-            return res.status(500).json({
-                success: false,
-                message: err.message
-            });
+            return sendSqlError(res, err);
         }
 
         if (!category) {
@@ -42,7 +68,7 @@ function show(req, res) {
 }
 
 function store(req, res) {
-    const { name, description } = req.body;
+    const { name, description } = normalizeCategoryInput(req.body);
 
     if (!name) {
         return res.status(400).json({
@@ -51,17 +77,21 @@ function store(req, res) {
         });
     }
 
-    categoryModel.createCategory(
-        {
-            name,
-            description
-        },
-        (err, category) => {
+    categoryModel.getCategoryByName(name, null, (findErr, existingCategory) => {
+        if (findErr) {
+            return sendSqlError(res, findErr);
+        }
+
+        if (existingCategory) {
+            return res.status(409).json({
+                success: false,
+                message: "Tên danh mục đã tồn tại"
+            });
+        }
+
+        categoryModel.createCategory({ name, description }, (err, category) => {
             if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
+                return sendSqlError(res, err);
             }
 
             res.status(201).json({
@@ -69,13 +99,20 @@ function store(req, res) {
                 message: "Thêm danh mục thành công",
                 data: category
             });
-        }
-    );
+        });
+    });
 }
 
 function update(req, res) {
     const id = req.params.id;
-    const { name, description } = req.body;
+    const { name, description } = normalizeCategoryInput(req.body);
+
+    if (!isValidId(id)) {
+        return res.status(400).json({
+            success: false,
+            message: "ID danh mục không hợp lệ"
+        });
+    }
 
     if (!name) {
         return res.status(400).json({
@@ -84,18 +121,21 @@ function update(req, res) {
         });
     }
 
-    categoryModel.updateCategory(
-        id,
-        {
-            name,
-            description
-        },
-        (err, result) => {
+    categoryModel.getCategoryByName(name, id, (findErr, existingCategory) => {
+        if (findErr) {
+            return sendSqlError(res, findErr);
+        }
+
+        if (existingCategory) {
+            return res.status(409).json({
+                success: false,
+                message: "Tên danh mục đã tồn tại"
+            });
+        }
+
+        categoryModel.updateCategory(id, { name, description }, (err, result) => {
             if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
+                return sendSqlError(res, err);
             }
 
             if (result.changes === 0) {
@@ -110,31 +150,54 @@ function update(req, res) {
                 message: "Cập nhật danh mục thành công",
                 data: result
             });
-        }
-    );
+        });
+    });
 }
 
 function destroy(req, res) {
     const id = req.params.id;
 
-    categoryModel.deleteCategory(id, (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: err.message
-            });
+    if (!isValidId(id)) {
+        return res.status(400).json({
+            success: false,
+            message: "ID danh mục không hợp lệ"
+        });
+    }
+
+    categoryModel.getCategoryById(id, (findErr, category) => {
+        if (findErr) {
+            return sendSqlError(res, findErr);
         }
 
-        if (result.changes === 0) {
+        if (!category) {
             return res.status(404).json({
                 success: false,
                 message: "Không tìm thấy danh mục"
             });
         }
 
-        res.json({
-            success: true,
-            message: "Xóa danh mục thành công"
+        categoryModel.countProductsByCategory(id, (countErr, result) => {
+            if (countErr) {
+                return sendSqlError(res, countErr);
+            }
+
+            if (result.count > 0) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Không thể xóa danh mục đang có sản phẩm"
+                });
+            }
+
+            categoryModel.deleteCategory(id, (err) => {
+                if (err) {
+                    return sendSqlError(res, err);
+                }
+
+                res.json({
+                    success: true,
+                    message: "Xóa danh mục thành công"
+                });
+            });
         });
     });
 }

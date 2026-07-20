@@ -8,55 +8,46 @@ const emptyCategoryForm = {
     description: ""
 };
 
+function normalizeName(name) {
+    return name.trim().toLowerCase();
+}
+
 function CategoryPage() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
+    const [deletingId, setDeletingId] = useState(null);
+    const [message, setMessage] = useState({ type: "", text: "" });
+    const [formError, setFormError] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [form, setForm] = useState(emptyCategoryForm);
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
-        setError("");
+        setMessage({ type: "", text: "" });
 
         try {
             const res = await api.get("/categories");
             setCategories(res.data.data || []);
         } catch (err) {
-            setError(err.response?.data?.message || "Không tải được danh sách danh mục");
+            setMessage({
+                type: "error",
+                text: err.response?.data?.message || "Không tải được danh sách danh mục"
+            });
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        let ignore = false;
-
-        setLoading(true);
-        api.get("/categories")
-            .then((res) => {
-                if (ignore) return;
-                setCategories(res.data.data || []);
-            })
-            .catch((err) => {
-                if (ignore) return;
-                setError(err.response?.data?.message || "Không tải được danh sách danh mục");
-            })
-            .finally(() => {
-                if (ignore) return;
-                setLoading(false);
-            });
-
-        return () => {
-            ignore = true;
-        };
-    }, []);
+        Promise.resolve().then(fetchCategories);
+    }, [fetchCategories]);
 
     const openCreateModal = () => {
         setEditingCategory(null);
         setForm(emptyCategoryForm);
+        setFormError("");
         setModalOpen(true);
     };
 
@@ -66,6 +57,7 @@ function CategoryPage() {
             name: category.name || "",
             description: category.description || ""
         });
+        setFormError("");
         setModalOpen(true);
     };
 
@@ -74,15 +66,32 @@ function CategoryPage() {
         setModalOpen(false);
         setEditingCategory(null);
         setForm(emptyCategoryForm);
+        setFormError("");
     };
 
     const updateForm = (field, value) => {
         setForm((prev) => ({ ...prev, [field]: value }));
+        setFormError("");
     };
 
     const validateForm = () => {
-        if (!form.name.trim()) {
+        const categoryName = form.name.trim();
+
+        if (!categoryName) {
             return "Tên danh mục không được để trống";
+        }
+
+        const normalizedInput = normalizeName(categoryName);
+        const duplicate = categories.some((category) => {
+            if (editingCategory && category.id === editingCategory.id) {
+                return false;
+            }
+
+            return normalizeName(category.name || "") === normalizedInput;
+        });
+
+        if (duplicate) {
+            return "Tên danh mục đã tồn tại";
         }
 
         return "";
@@ -93,11 +102,13 @@ function CategoryPage() {
 
         const validationError = validateForm();
         if (validationError) {
-            window.alert(validationError);
+            setFormError(validationError);
             return;
         }
 
         setSaving(true);
+        setFormError("");
+        setMessage({ type: "", text: "" });
 
         try {
             const payload = {
@@ -105,16 +116,21 @@ function CategoryPage() {
                 description: form.description.trim() || null
             };
 
-            if (editingCategory) {
-                await api.put(`/categories/${editingCategory.id}`, payload);
-            } else {
-                await api.post("/categories", payload);
-            }
+            const response = editingCategory
+                ? await api.put(`/categories/${editingCategory.id}`, payload)
+                : await api.post("/categories", payload);
 
             await fetchCategories();
-            closeModal();
+            setModalOpen(false);
+            setEditingCategory(null);
+            setForm(emptyCategoryForm);
+            setFormError("");
+            setMessage({
+                type: "success",
+                text: response.data.message || (editingCategory ? "Cập nhật danh mục thành công" : "Thêm danh mục thành công")
+            });
         } catch (err) {
-            window.alert(err.response?.data?.message || "Không lưu được danh mục");
+            setFormError(err.response?.data?.message || "Không lưu được danh mục");
         } finally {
             setSaving(false);
         }
@@ -124,11 +140,23 @@ function CategoryPage() {
         const confirmed = window.confirm(`Xóa danh mục "${category.name}"?`);
         if (!confirmed) return;
 
+        setDeletingId(category.id);
+        setMessage({ type: "", text: "" });
+
         try {
-            await api.delete(`/categories/${category.id}`);
+            const response = await api.delete(`/categories/${category.id}`);
             await fetchCategories();
+            setMessage({
+                type: "success",
+                text: response.data.message || "Xóa danh mục thành công"
+            });
         } catch (err) {
-            window.alert(err.response?.data?.message || "Không xóa được danh mục");
+            setMessage({
+                type: "error",
+                text: err.response?.data?.message || "Không xóa được danh mục"
+            });
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -139,14 +167,14 @@ function CategoryPage() {
                     <h1>Quản lý danh mục</h1>
                     <p>Quản lý danh mục đồ uống và món bán trong hệ thống.</p>
                 </div>
-                <button className="btn btn-primary" onClick={openCreateModal}>
+                <button className="btn btn-primary" onClick={openCreateModal} disabled={loading}>
                     <span className="btn-plus-icon">+</span> Thêm danh mục
                 </button>
             </div>
 
-            {error && (
-                <div className="tb-api-message" role="alert">
-                    {error}
+            {message.text && (
+                <div className={`alert alert-${message.type === "success" ? "success" : "error"}`} role="alert">
+                    {message.text}
                 </div>
             )}
 
@@ -193,13 +221,21 @@ function CategoryPage() {
                                         <td>{category.description || "Không có mô tả"}</td>
                                         <td>
                                             <div className="table-actions">
-                                                <button className="btn btn-sm btn-edit" onClick={() => openEditModal(category)}>
+                                                <button
+                                                    className="btn btn-sm btn-edit"
+                                                    onClick={() => openEditModal(category)}
+                                                    disabled={deletingId === category.id}
+                                                >
                                                     <img src={editIcon} alt="" className="btn-icon" aria-hidden="true" />
                                                     Sửa
                                                 </button>
-                                                <button className="btn btn-sm btn-delete" onClick={() => handleDeleteCategory(category)}>
+                                                <button
+                                                    className="btn btn-sm btn-delete"
+                                                    onClick={() => handleDeleteCategory(category)}
+                                                    disabled={deletingId === category.id}
+                                                >
                                                     <img src={deleteIcon} alt="" className="btn-icon" aria-hidden="true" />
-                                                    Xóa
+                                                    {deletingId === category.id ? "Đang xóa..." : "Xóa"}
                                                 </button>
                                             </div>
                                         </td>
@@ -225,6 +261,12 @@ function CategoryPage() {
                         </div>
 
                         <form className="entity-form" onSubmit={handleSubmit}>
+                            {formError && (
+                                <div className="alert alert-error" role="alert">
+                                    {formError}
+                                </div>
+                            )}
+
                             <div className="form-group">
                                 <label htmlFor="category-name">Tên danh mục</label>
                                 <input
@@ -233,6 +275,7 @@ function CategoryPage() {
                                     onChange={(event) => updateForm("name", event.target.value)}
                                     placeholder="Ví dụ: Cafe"
                                     autoFocus
+                                    disabled={saving}
                                 />
                             </div>
 
@@ -244,6 +287,7 @@ function CategoryPage() {
                                     onChange={(event) => updateForm("description", event.target.value)}
                                     placeholder="Mô tả ngắn về danh mục"
                                     rows={4}
+                                    disabled={saving}
                                 />
                             </div>
 
