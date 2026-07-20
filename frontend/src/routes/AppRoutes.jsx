@@ -11,36 +11,22 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
+//
+import CreateOrderPage from "../pages/CreateOrderPage"; 
+import AddItemPage from "../pages/AddItemPage";
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
-
-    if (loading) {
-        return null;
-    }
-
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
+    if (loading) return null;
+    if (!user) return <Navigate to="/login" />;
     return children;
 }
 
 function AdminRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
-
-    if (loading) {
-        return null;
-    }
-
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
-    if (user.role !== "admin") {
-        return <Navigate to="/dashboard" />;
-    }
-
+    if (loading) return null;
+    if (!user) return <Navigate to="/login" />;
+    if (user.role !== "admin") return <Navigate to="/dashboard" />;
     return children;
 }
 
@@ -71,6 +57,27 @@ function AppRoutes() {
                     </ProtectedLayout>
                 }
             />
+
+            {/* CREATE ODER*/}
+            <Route
+                path="/create-order"
+                element={
+                    <ProtectedLayout>
+                        <CreateOrderPage />
+                    </ProtectedLayout>
+                }
+            />
+
+              {/*  ODER item*/}
+            <Route
+                 path="/orders/:orderId/add-item"
+                 element={
+                 <ProtectedLayout>
+                    <AddItemPage />
+                 </ProtectedLayout>
+                }
+            />
+                
 
             <Route
                 path="/categories"

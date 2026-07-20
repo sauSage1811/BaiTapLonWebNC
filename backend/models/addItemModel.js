@@ -19,15 +19,39 @@ function getProductPrice(product_id) {
 }
 
 function addOrderItem(order_id, product_id, quantity, price) {
-    const subtotal = quantity * price;
-
     return new Promise((resolve, reject) => {
-        db.run(
-            'INSERT INTO order_items (order_id, product_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)',
-            [order_id, product_id, quantity, price, subtotal],
-            function(err) {
-                if (err) reject(err);
-                else resolve(this);
+        // Kiểm tra xem món ăn này đã được thêm vào đơn hàng chưa
+        db.get(
+            'SELECT id, quantity FROM order_items WHERE order_id = ? AND product_id = ?',
+            [order_id, product_id],
+            (err, row) => {
+                if (err) return reject(err);
+
+                if (row) {
+                    // Nếu có rồi: Cộng dồn số lượng và cập nhật subtotal mới
+                    const newQuantity = row.quantity + quantity;
+                    const newSubtotal = newQuantity * price;
+
+                    db.run(
+                        'UPDATE order_items SET quantity = ?, subtotal = ? WHERE id = ?',
+                        [newQuantity, newSubtotal, row.id],
+                        function(err) {
+                            if (err) reject(err);
+                            else resolve(this);
+                        }
+                    );
+                } else {
+                    // Nếu chưa có: Tạo dòng mới như bình thường
+                    const subtotal = quantity * price;
+                    db.run(
+                        'INSERT INTO order_items (order_id, product_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?)',
+                        [order_id, product_id, quantity, price, subtotal],
+                        function(err) {
+                            if (err) reject(err);
+                            else resolve(this);
+                        }
+                    );
+                }
             }
         );
     });
