@@ -101,7 +101,7 @@ function Dashboard() {
 
                 <div className="stat-card animate-in">
                     <div className="stat-card-header">
-                        <div className="stat-card-icon">🪑</div>
+                        <div className="stat-card-icon"></div>
                     </div>
                     <div className="stat-card-value">{formatStat(stats.tables)}</div>
                     <div className="stat-card-label">Tổng số bàn</div>
@@ -135,7 +135,7 @@ function Dashboard() {
                             </div>
                         </Link>
                         <Link to="/tables" className="quick-action-card">
-                            <div className="quick-action-icon">🪑</div>
+                            <div className="quick-action-icon"></div>
                             <div>
                                 <div className="quick-action-text">Quản lý bàn</div>
                                 <div className="quick-action-desc">Trạng thái bàn trong quán</div>
