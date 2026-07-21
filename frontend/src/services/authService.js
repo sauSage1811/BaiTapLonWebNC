@@ -20,6 +20,14 @@ export function getMeApi() {
     return api.get("/auth/me");
 }
 
+export function updateMeApi(data) {
+    return api.put("/auth/me", data);
+}
+
+export function changePasswordApi(data) {
+    return api.post("/auth/change-password", data);
+}
+
 export function logoutApi() {
     return api.post("/auth/logout");
 }

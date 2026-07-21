@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getMeApi, loginApi, logoutApi } from "../services/authService";
 import { AuthContext } from "./AuthContext";
 
@@ -83,8 +83,25 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    const setCurrentUser = useCallback((nextUser) => {
+        setUser(nextUser);
+
+        if (nextUser) {
+            localStorage.setItem("user", JSON.stringify(nextUser));
+        } else {
+            localStorage.removeItem("user");
+        }
+    }, []);
+
+    const refreshUser = useCallback(async () => {
+        const res = await getMeApi();
+        const currentUser = res.data?.data || null;
+        setCurrentUser(currentUser);
+        return currentUser;
+    }, [setCurrentUser]);
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, setCurrentUser, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

@@ -11,36 +11,24 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
+import CreateOrderPage from "../pages/CreateOrderPage";
+import SettingsPage from "../pages/SettingsPage";
+import AddItemPage from "../pages/AddItemPage";
+import PayOrderPage from "../pages/PayOrderPage";
+import OrderHistoryPage from "../pages/OrderHistoryPage";
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
-
-    if (loading) {
-        return null;
-    }
-
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
+    if (loading) return null;
+    if (!user) return <Navigate to="/login" />;
     return children;
 }
 
 function AdminRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
-
-    if (loading) {
-        return null;
-    }
-
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
-    if (user.role !== "admin") {
-        return <Navigate to="/dashboard" />;
-    }
-
+    if (loading) return null;
+    if (!user) return <Navigate to="/login" />;
+    if (user.role !== "admin") return <Navigate to="/dashboard" />;
     return children;
 }
 
@@ -72,6 +60,47 @@ function AppRoutes() {
                 }
             />
 
+            {/* CREATE ORDER */}
+            <Route
+                path="/create-order"
+                element={
+                    <ProtectedLayout>
+                        <CreateOrderPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* ORDER ITEM */}
+            <Route
+                path="/orders/:orderId/add-item"
+                element={
+                    <ProtectedLayout>
+                        <AddItemPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* PAY ORDER */}
+            <Route
+                path="/orders/:orderId/pay"
+                element={
+                    <ProtectedLayout>
+                        <PayOrderPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* 2. THÊM ROUTE LỊCH SỬ ĐƠN HÀNG VÀO ĐÂY */}
+            <Route
+                path="/orders/history"
+                element={
+                    <ProtectedLayout>
+                        <OrderHistoryPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* Admin Routes */}
             <Route
                 path="/categories"
                 element={
@@ -102,6 +131,15 @@ function AppRoutes() {
                             <TablePage />
                         </ProtectedLayout>
                     </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedLayout>
+                        <SettingsPage />
+                    </ProtectedLayout>
                 }
             />
 
