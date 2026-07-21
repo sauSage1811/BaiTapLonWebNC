@@ -165,7 +165,26 @@ function PayOrderPage() {
                         cursor: submitting ? "not-allowed" : "pointer"
                     }}
                 >
-                    {submitting ? "⏳ Đang xử lý..." : "✅ Xác Nhận Thanh Toán"}
+                    {submitting ? " Đang xử lý..." : " Xác Nhận Thanh Toán"}
+                </button>
+
+                <button
+                    type="button"   
+                    onClick={() => navigate("/")}
+                    style={{
+                        width: "100%",
+                        marginTop: "10px",
+                        padding: "12px",
+                        backgroundColor: "#6c757d",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        cursor: "pointer"
+                    }}
+                >
+                    Thanh toán sau
                 </button>
 
             </div>

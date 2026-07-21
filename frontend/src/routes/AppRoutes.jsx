@@ -16,6 +16,7 @@ import CreateOrderPage from "../pages/CreateOrderPage";
 import AddItemPage from "../pages/AddItemPage";
 
 import PayOrderPage from "../pages/PayOrderPage";
+import OrderHistoryPage from "../pages/OrderHistoryPage"; 
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
@@ -80,12 +81,22 @@ function AppRoutes() {
                 }
             />
 
-            {/* 2. PAY ORDER (Trang thanh toán mới thêm) */}
+            {/* PAY ORDER */}
             <Route
                 path="/orders/:orderId/pay"
                 element={
                     <ProtectedLayout>
                         <PayOrderPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* 2. THÊM ROUTE LỊCH SỬ ĐƠN HÀNG VÀO ĐÂY */}
+            <Route
+                path="/orders/history"
+                element={
+                    <ProtectedLayout>
+                        <OrderHistoryPage />
                     </ProtectedLayout>
                 }
             />
