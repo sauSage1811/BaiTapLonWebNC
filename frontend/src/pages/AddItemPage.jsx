@@ -111,7 +111,7 @@ function AddItemPage() {
                     onClick={() => navigate("/")} 
                     style={{ padding: "8px 16px", backgroundColor: "#f3f4f6", color: "#4b5563", border: "1px solid #e5e7eb", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
                 >
-                    ↩️ Sơ đồ bàn
+                    ↩ Sơ đồ bàn
                 </button>
             </div>
             

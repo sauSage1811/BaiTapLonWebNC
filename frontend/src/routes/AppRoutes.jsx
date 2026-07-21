@@ -11,9 +11,11 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
-//
+
 import CreateOrderPage from "../pages/CreateOrderPage"; 
 import AddItemPage from "../pages/AddItemPage";
+
+import PayOrderPage from "../pages/PayOrderPage";
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
@@ -58,7 +60,7 @@ function AppRoutes() {
                 }
             />
 
-            {/* CREATE ODER*/}
+            {/* CREATE ORDER */}
             <Route
                 path="/create-order"
                 element={
@@ -68,17 +70,27 @@ function AppRoutes() {
                 }
             />
 
-              {/*  ODER item*/}
+            {/* ORDER ITEM */}
             <Route
-                 path="/orders/:orderId/add-item"
-                 element={
-                 <ProtectedLayout>
-                    <AddItemPage />
-                 </ProtectedLayout>
+                path="/orders/:orderId/add-item"
+                element={
+                    <ProtectedLayout>
+                        <AddItemPage />
+                    </ProtectedLayout>
                 }
             />
-                
 
+            {/* 2. PAY ORDER (Trang thanh toán mới thêm) */}
+            <Route
+                path="/orders/:orderId/pay"
+                element={
+                    <ProtectedLayout>
+                        <PayOrderPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* Admin Routes */}
             <Route
                 path="/categories"
                 element={
