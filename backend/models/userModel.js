@@ -37,6 +37,44 @@ function findUserById(id) {
     });
 }
 
+function findUserWithPasswordById(id) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT id, full_name, username, password, role, status, created_at
+            FROM users
+            WHERE id = ?
+            LIMIT 1
+        `;
+
+        db.get(sql, [id], (err, row) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(row);
+        });
+    });
+}
+
+function findUserByUsernameExceptId(username, id) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT id, username
+            FROM users
+            WHERE username = ? AND id != ?
+            LIMIT 1
+        `;
+
+        db.get(sql, [username, id], (err, row) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(row);
+        });
+    });
+}
+
 function createUser(data) {
     return new Promise((resolve, reject) => {
         const sql = `
@@ -64,6 +102,24 @@ function createUser(data) {
     });
 }
 
+function updateProfileById(id, data) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            UPDATE users
+            SET full_name = ?, username = ?
+            WHERE id = ?
+        `;
+
+        db.run(sql, [data.full_name, data.username, id], function(err) {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve({ changes: this.changes });
+        });
+    });
+}
+
 function updatePassword(username, newPassword) {
     return new Promise((resolve, reject) => {
         const sql = `
@@ -73,6 +129,24 @@ function updatePassword(username, newPassword) {
         `;
 
         db.run(sql, [newPassword, username], function(err) {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve({ changes: this.changes });
+        });
+    });
+}
+
+function updatePasswordById(id, newPassword) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            UPDATE users
+            SET password = ?
+            WHERE id = ?
+        `;
+
+        db.run(sql, [newPassword, id], function(err) {
             if (err) {
                 return reject(err);
             }
@@ -103,7 +177,11 @@ function updateSecurityAnswer(username, newSecurityAnswer) {
 module.exports = {
     findUserByUsername,
     findUserById,
+    findUserWithPasswordById,
+    findUserByUsernameExceptId,
     createUser,
+    updateProfileById,
     updatePassword,
+    updatePasswordById,
     updateSecurityAnswer
 };

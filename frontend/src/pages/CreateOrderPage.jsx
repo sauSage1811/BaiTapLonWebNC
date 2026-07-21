@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
@@ -11,25 +11,29 @@ function CreateOrderPage() {
     const [message, setMessage] = useState({ type: "", text: "" });
 
     // Hàm tiện ích để tự động cấu hình Header chứa Token gửi lên Backend
-    const getConfigWithToken = () => {
+    const getConfigWithToken = useCallback(() => {
         const token = localStorage.getItem("token");
         return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    };
+    }, []);
+
+    const refreshAvailableTables = useCallback(async () => {
+        const response = await api.get("/tables/available", getConfigWithToken());
+        const data = response.data.data || response.data;
+        setTables(data);
+    }, [getConfigWithToken]);
 
     // 1. Lấy danh sách bàn từ Backend
     useEffect(() => {
         const fetchTables = async () => {
             try {
-                const response = await api.get("/tables", getConfigWithToken());
-                const data = response.data.data || response.data;
-                setTables(data);
+                await refreshAvailableTables();
             } catch (err) {
                 console.error("Lỗi lấy danh sách bàn từ Backend:", err);
                 setMessage({ type: "error", text: "Không thể kết nối với máy chủ để lấy sơ đồ bàn. Bạn đã đăng nhập chưa?" });
             }
         };
         fetchTables();
-    }, []);
+    }, [refreshAvailableTables]);
 
     // 2. Xử lý tạo Đơn Hàng Tại Bàn
     const handleCreateOrder = async (e) => {
@@ -64,6 +68,18 @@ function CreateOrderPage() {
             }
         } catch (err) {
             console.error("Lỗi API Backend:", err.response?.data);
+            const shouldRefreshTables = err.response?.status === 400 || err.response?.status === 409;
+
+            if (shouldRefreshTables) {
+                setSelectedTable("");
+
+                try {
+                    await refreshAvailableTables();
+                } catch (refreshErr) {
+                    console.error("Lỗi làm mới danh sách bàn:", refreshErr);
+                }
+            }
+
             setMessage({ 
                 type: "error", 
                 text: err.response?.data?.message || "Không thể tạo đơn hàng. Hãy kiểm tra quyền Admin/Staff hoặc trạng thái bàn!" 
@@ -121,20 +137,20 @@ function CreateOrderPage() {
     };
 
     return (
-        <div style={{ padding: "30px", maxWidth: "1000px", margin: "0 auto", fontFamily: "Segoe UI, sans-serif" }}>
+        <div className="create-order-page" style={{ padding: "30px", maxWidth: "1000px", margin: "0 auto", fontFamily: "Segoe UI, sans-serif" }}>
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px", borderBottom: "2px solid #f0f0f0", paddingBottom: "15px" }}>
+            <div className="create-order-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px", borderBottom: "2px solid #f0f0f0", paddingBottom: "15px" }}>
                 <div>
-                    <h2 style={{ margin: 0, color: "#4A3B32", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <h2 className="create-order-title" style={{ margin: 0, color: "#4A3B32", display: "flex", alignItems: "center", gap: "10px" }}>
                         ☕ Sơ Đồ Gọi Món Tại Bàn
                     </h2>
-                    <p style={{ margin: "5px 0 0 0", color: "#888", fontSize: "14px" }}>Chọn bàn trống trực quan bên dưới để khởi tạo hóa đơn thực tế.</p>
+                    <p className="create-order-subtitle" style={{ margin: "5px 0 0 0", color: "#888", fontSize: "14px" }}>Chọn bàn trống trực quan bên dưới để khởi tạo hóa đơn thực tế.</p>
                 </div>
             </div>
 
             {/* Thông báo trạng thái */}
             {message.text && (
-                <div style={{ 
+                <div className={`create-order-message create-order-message-${message.type}`} style={{ 
                     padding: "12px 20px", 
                     marginBottom: "20px", 
                     borderRadius: "8px",
@@ -150,8 +166,8 @@ function CreateOrderPage() {
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "30px" }}>
                 
                 {/* BÊN TRÁI: Sơ đồ phòng bàn */}
-                <div>
-                    <h3 style={{ marginTop: 0, marginBottom: "15px", color: "#666", fontSize: "16px" }}>Giao diện sơ đồ phòng bàn:</h3>
+                <div className="create-order-map">
+                    <h3 className="create-order-section-title" style={{ marginTop: 0, marginBottom: "15px", color: "#666", fontSize: "16px" }}>Giao diện sơ đồ phòng bàn:</h3>
                     
                     <div style={{ 
                         display: "grid", 
@@ -159,7 +175,6 @@ function CreateOrderPage() {
                         gap: "15px" 
                     }}>
                         {tables
-                            .filter(t => !t.name?.toLowerCase().includes("mang về"))
                             .map((table) => {
                                 const isSelected = selectedTable === table.id;
                                 const isUsing = table.status === "using";
@@ -169,6 +184,7 @@ function CreateOrderPage() {
                                 return (
                                     <div 
                                         key={table.id}
+                                        className={`create-order-table-card${isSelected ? " is-selected" : ""}${isUsing ? " is-using" : ""}${isMaintenance ? " is-maintenance" : ""}`}
                                         onClick={() => !isDisable && setSelectedTable(table.id)}
                                         style={{
                                             padding: "20px 10px",
@@ -184,7 +200,7 @@ function CreateOrderPage() {
                                             opacity: isMaintenance ? 0.6 : 1
                                         }}
                                     >
-                                        <span style={{
+                                        <span className="create-order-status-dot" style={{
                                             position: "absolute",
                                             top: "8px",
                                             right: "8px",
@@ -194,14 +210,14 @@ function CreateOrderPage() {
                                             backgroundColor: isUsing ? "#e02424" : isMaintenance ? "#f59e0b" : "#10b981"
                                         }} />
 
-                                        <div style={{ fontSize: "28px", marginBottom: "8px" }}></div>
-                                        <div style={{ fontWeight: "bold", color: "#333", fontSize: "15px" }}>
+                                        <div className="create-order-table-icon" style={{ fontSize: "28px", marginBottom: "8px" }}></div>
+                                        <div className="create-order-table-name" style={{ fontWeight: "bold", color: "#333", fontSize: "15px" }}>
                                             {table.name?.toLowerCase().includes("bàn") ? table.name : `Bàn ${table.name || table.id}`}
                                         </div>
-                                        <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+                                        <div className="create-order-table-floor" style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
                                             {table.floor || "Tầng 1"}
                                         </div>
-                                        <div style={{ 
+                                        <div className="create-order-table-status" style={{ 
                                             fontSize: "11px", 
                                             marginTop: "8px", 
                                             fontWeight: "600",
@@ -216,7 +232,7 @@ function CreateOrderPage() {
                 </div>
 
                 {/* BÊN PHẢI: Form Xác Nhận Thông Tin */}
-                <div style={{ 
+                <div className="create-order-panel" style={{ 
                     background: "#ffffff", 
                     padding: "25px", 
                     borderRadius: "16px", 
@@ -224,12 +240,12 @@ function CreateOrderPage() {
                     border: "1px solid #f0f0f0",
                     height: "fit-content"
                 }}>
-                    <h3 style={{ marginTop: 0, marginBottom: "20px", color: "#4A3B32" }}>Thông Tin Đơn Hàng</h3>
+                    <h3 className="create-order-panel-title" style={{ marginTop: 0, marginBottom: "20px", color: "#4A3B32" }}>Thông Tin Đơn Hàng</h3>
                     
                     <form onSubmit={handleCreateOrder}>
                         <div style={{ marginBottom: "20px" }}>
-                            <label style={{ display: "block", marginBottom: "8px", color: "#555", fontWeight: "600" }}>Bàn đang chọn:</label>
-                            <div style={{ 
+                            <label className="create-order-label" style={{ display: "block", marginBottom: "8px", color: "#555", fontWeight: "600" }}>Bàn đang chọn:</label>
+                            <div className="create-order-selected-box" style={{ 
                                 padding: "12px", 
                                 backgroundColor: "#f9f9f9", 
                                 borderRadius: "8px", 
@@ -249,8 +265,9 @@ function CreateOrderPage() {
                         </div>
 
                         <div style={{ marginBottom: "20px" }}>
-                            <label style={{ display: "block", marginBottom: "8px", color: "#555", fontWeight: "600" }}>Ghi chú:</label>
+                            <label className="create-order-label" style={{ display: "block", marginBottom: "8px", color: "#555", fontWeight: "600" }}>Ghi chú:</label>
                             <textarea 
+                                className="create-order-note"
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
                                 placeholder="Ghi chú dịch vụ..."
@@ -268,6 +285,7 @@ function CreateOrderPage() {
                         </div>
 
                         <button 
+                            className="create-order-submit"
                             type="submit" 
                             disabled={loading || !selectedTable}
                             style={{ 
@@ -288,6 +306,7 @@ function CreateOrderPage() {
                         </button>
 
                         <button 
+                            className="create-order-takeaway"
                             type="button"
                             onClick={handleTakeawayOrder}
                             disabled={loading}

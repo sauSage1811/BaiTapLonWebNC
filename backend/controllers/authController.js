@@ -12,6 +12,10 @@ function normalizeUsername(value) {
     return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizeFullName(value) {
+    return typeof value === "string" ? value.trim() : "";
+}
+
 function normalizeSecurityAnswer(value) {
     return typeof value === "string" ? value.trim().toLowerCase() : "";
 }
@@ -182,6 +186,144 @@ async function me(req, res) {
         res.status(500).json({
             success: false,
             message: "Không thể tải thông tin người dùng"
+        });
+    }
+}
+
+async function updateProfile(req, res) {
+    const userId = req.user?.id;
+    const fullName = normalizeFullName(req.body.full_name);
+    const username = normalizeUsername(req.body.username);
+
+    if (!userId) {
+        return res.status(401).json({
+            success: false,
+            message: "Ban chua dang nhap"
+        });
+    }
+
+    if (!fullName || !username) {
+        return res.status(400).json({
+            success: false,
+            message: "Vui long nhap day du thong tin ca nhan",
+            errors: {
+                full_name: !fullName ? "Ho va ten khong duoc de trong" : undefined,
+                username: !username ? "Ten dang nhap hoac email khong duoc de trong" : undefined
+            }
+        });
+    }
+
+    try {
+        const existingUser = await userModel.findUserById(userId);
+
+        if (!existingUser) {
+            return res.status(401).json({
+                success: false,
+                message: "Tai khoan khong con ton tai"
+            });
+        }
+
+        const usernameOwner = await userModel.findUserByUsernameExceptId(username, userId);
+
+        if (usernameOwner) {
+            return res.status(409).json({
+                success: false,
+                message: "Ten dang nhap hoac email da ton tai",
+                errors: {
+                    username: "Ten dang nhap hoac email da ton tai"
+                }
+            });
+        }
+
+        await userModel.updateProfileById(userId, {
+            full_name: fullName,
+            username
+        });
+
+        const updatedUser = await userModel.findUserById(userId);
+
+        res.json({
+            success: true,
+            message: "Cap nhat thong tin ca nhan thanh cong",
+            data: sanitizeUser(updatedUser)
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Khong the cap nhat thong tin ca nhan"
+        });
+    }
+}
+
+async function changePassword(req, res) {
+    const userId = req.user?.id;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const errors = {};
+
+    if (!userId) {
+        return res.status(401).json({
+            success: false,
+            message: "Ban chua dang nhap"
+        });
+    }
+
+    if (!currentPassword) {
+        errors.currentPassword = "Mat khau hien tai khong duoc de trong";
+    }
+
+    if (!newPassword) {
+        errors.newPassword = "Mat khau moi khong duoc de trong";
+    } else if (String(newPassword).length < 6) {
+        errors.newPassword = "Mat khau moi toi thieu 6 ky tu";
+    }
+
+    if (!confirmPassword) {
+        errors.confirmPassword = "Xac nhan mat khau moi khong duoc de trong";
+    } else if (String(newPassword) !== String(confirmPassword)) {
+        errors.confirmPassword = "Xac nhan mat khau phai trung voi mat khau moi";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Vui long kiem tra lai thong tin doi mat khau",
+            errors
+        });
+    }
+
+    try {
+        const user = await userModel.findUserWithPasswordById(userId);
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Tai khoan khong con ton tai"
+            });
+        }
+
+        const passwordValid = await verifyPassword(String(currentPassword), user.password);
+
+        if (!passwordValid) {
+            return res.status(400).json({
+                success: false,
+                message: "Mat khau hien tai khong chinh xac",
+                errors: {
+                    currentPassword: "Mat khau hien tai khong chinh xac"
+                }
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(String(newPassword), SALT_ROUNDS);
+        await userModel.updatePasswordById(userId, hashedPassword);
+
+        res.json({
+            success: true,
+            message: "Doi mat khau thanh cong"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Khong the doi mat khau luc nay"
         });
     }
 }
@@ -378,6 +520,8 @@ async function resetPassword(req, res) {
 module.exports = {
     login,
     me,
+    updateProfile,
+    changePassword,
     logout,
     register,
     forgotPassword,

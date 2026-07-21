@@ -5,6 +5,7 @@ import dashboardIcon from "../assets/icons/dashboard.svg";
 import categoryIcon from "../assets/icons/category.svg";
 import productIcon from "../assets/icons/product.svg";
 import tableIcon from "../assets/icons/table.svg";
+import settingsIcon from "../assets/icons/settings.svg";
 import logoutIcon from "../assets/icons/logout.svg";
 //
 import orderIcon from "../assets/icons/order.svg";
@@ -14,12 +15,14 @@ const adminMenuItems = [
     { to: "/products", icon: productIcon, label: "Menu" },
     { to: "/tables", icon: tableIcon, label: "Bàn" },
     //
-    { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" }
+    { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" },
+    { to: "/settings", icon: settingsIcon, label: "Cài đặt" }
 ];
 
 const staffMenuItems = [
     { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
    { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" },
+   { to: "/settings", icon: settingsIcon, label: "Cài đặt" },
 ];
 
 function Sidebar({ collapsed, onToggle }) {

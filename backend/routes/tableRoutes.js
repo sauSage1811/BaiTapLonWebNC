@@ -7,6 +7,8 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 // Everyone can read
 router.get("/", authMiddleware, tableController.index);
+router.get("/available", authMiddleware, tableController.available);
+router.get("/:id/latest-paid-order", authMiddleware, tableController.latestPaidOrder);
 router.get("/:id", authMiddleware, tableController.show);
 
 // Only admin can create/update/delete

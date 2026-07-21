@@ -2,18 +2,57 @@ const db = require("../config/db");
 
 const VALID_TABLE_STATUSES = ['empty', 'using', 'maintenance'];
 
+const ACTIVE_ORDER_SELECT = `
+    SELECT o.id
+    FROM orders o
+    WHERE o.table_id = t.id AND o.status = 'pending'
+    ORDER BY o.created_at DESC, o.id DESC
+    LIMIT 1
+`;
+
+const EFFECTIVE_STATUS_SELECT = `
+    CASE
+        WHEN t.status = 'maintenance' THEN 'maintenance'
+        WHEN t.status = 'using' THEN 'using'
+        ELSE 'empty'
+    END
+`;
+
 const TABLE_SELECT = `
     SELECT
-        id,
-        name,
-        name AS tableNumber,
-        capacity,
-        floor,
-        area,
-        status,
-        use_time AS useTime,
-        created_at
-    FROM tables
+        t.id,
+        t.name,
+        t.name AS tableNumber,
+        t.capacity,
+        t.floor,
+        t.area,
+        t.status AS raw_status,
+        ${EFFECTIVE_STATUS_SELECT} AS status,
+        (${ACTIVE_ORDER_SELECT}) AS active_order_id,
+        t.use_time AS useTime,
+        t.created_at,
+        (
+            SELECT o.id
+            FROM orders o
+            WHERE o.table_id = t.id AND o.status = 'paid'
+            ORDER BY o.paid_at DESC, o.id DESC
+            LIMIT 1
+        ) AS latest_paid_order_id,
+        (
+            SELECT o.paid_at
+            FROM orders o
+            WHERE o.table_id = t.id AND o.status = 'paid'
+            ORDER BY o.paid_at DESC, o.id DESC
+            LIMIT 1
+        ) AS latest_paid_at,
+        (
+            SELECT o.total_amount
+            FROM orders o
+            WHERE o.table_id = t.id AND o.status = 'paid'
+            ORDER BY o.paid_at DESC, o.id DESC
+            LIMIT 1
+        ) AS latest_paid_total
+    FROM tables t
 `;
 
 function normalizeTableData(data) {
@@ -40,7 +79,17 @@ function createValidationError(message) {
 function getAllTables(callback) {
     const sql = `
         ${TABLE_SELECT}
-        ORDER BY id ASC
+        ORDER BY t.id ASC
+    `;
+
+    db.all(sql, [], callback);
+}
+
+function getAvailableTables(callback) {
+    const sql = `
+        ${TABLE_SELECT}
+        WHERE ${EFFECTIVE_STATUS_SELECT} = 'empty'
+        ORDER BY t.id ASC
     `;
 
     db.all(sql, [], callback);
@@ -49,10 +98,64 @@ function getAllTables(callback) {
 function getTableById(id, callback) {
     const sql = `
         ${TABLE_SELECT}
-        WHERE id = ?
+        WHERE t.id = ?
     `;
 
     db.get(sql, [id], callback);
+}
+
+function getLatestPaidOrderByTableId(tableId, callback) {
+    const sql = `
+        SELECT
+            o.id,
+            o.table_id,
+            o.total_amount,
+            o.status,
+            o.created_at,
+            o.paid_at,
+            t.name AS table_name,
+            u.full_name AS cashier_name
+        FROM orders o
+        LEFT JOIN tables t ON t.id = o.table_id
+        LEFT JOIN users u ON u.id = o.user_id
+        WHERE o.table_id = ? AND o.status = 'paid'
+        ORDER BY o.paid_at DESC, o.id DESC
+        LIMIT 1
+    `;
+
+    db.get(sql, [tableId], (err, order) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (!order) {
+            return callback(null, null);
+        }
+
+        db.all(
+            `
+            SELECT
+                oi.id,
+                oi.product_id,
+                p.name AS product_name,
+                oi.quantity,
+                oi.price,
+                oi.subtotal
+            FROM order_items oi
+            LEFT JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = ?
+            ORDER BY oi.id ASC
+            `,
+            [order.id],
+            (itemsErr, items) => {
+                if (itemsErr) {
+                    return callback(itemsErr);
+                }
+
+                callback(null, { ...order, items });
+            }
+        );
+    });
 }
 
 function createTable(data, callback) {
@@ -156,7 +259,9 @@ function deleteTable(id, callback) {
 module.exports = {
     VALID_TABLE_STATUSES,
     getAllTables,
+    getAvailableTables,
     getTableById,
+    getLatestPaidOrderByTableId,
     createTable,
     updateTable,
     updateTableStatus,

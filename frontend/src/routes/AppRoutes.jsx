@@ -11,8 +11,9 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
+import SettingsPage from "../pages/SettingsPage";
 //
-import CreateOrderPage from "../pages/CreateOrderPage"; 
+import CreateOrderPage from "../pages/CreateOrderPage";
 import AddItemPage from "../pages/AddItemPage";
 
 function PrivateRoute({ children }) {
@@ -68,16 +69,16 @@ function AppRoutes() {
                 }
             />
 
-              {/*  ODER item*/}
+            {/*  ODER item*/}
             <Route
-                 path="/orders/:orderId/add-item"
-                 element={
-                 <ProtectedLayout>
-                    <AddItemPage />
-                 </ProtectedLayout>
+                path="/orders/:orderId/add-item"
+                element={
+                    <ProtectedLayout>
+                        <AddItemPage />
+                    </ProtectedLayout>
                 }
             />
-                
+
 
             <Route
                 path="/categories"
@@ -109,6 +110,15 @@ function AppRoutes() {
                             <TablePage />
                         </ProtectedLayout>
                     </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedLayout>
+                        <SettingsPage />
+                    </ProtectedLayout>
                 }
             />
 
