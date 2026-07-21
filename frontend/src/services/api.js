@@ -21,7 +21,7 @@ api.interceptors.response.use(
     (error) => {
         const status = error.response?.status;
         const requestUrl = error.config?.url || "";
-        const isAuthRoute = /\/auth\/(login|register|forgot-password|reset-password|me|logout)/.test(requestUrl);
+        const isAuthRoute = /\/auth\/(login|register|forgot-password|reset-password|change-password|me|logout)/.test(requestUrl);
 
         if (status === 401 && !isRedirecting && !isAuthRoute && window.location.pathname !== "/login") {
             isRedirecting = true;

@@ -33,6 +33,19 @@ function insertNewOrder(table_id, user_id) {
     });
 }
 
+function hasActiveOrderForTable(table_id) {
+    return new Promise((resolve, reject) => {
+        db.get(
+            'SELECT id FROM orders WHERE table_id = ? AND status = "pending" ORDER BY created_at DESC, id DESC LIMIT 1',
+            [table_id],
+            (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            }
+        );
+    });
+}
+
 function updateTableStatus(table_id, status) {
     return new Promise((resolve, reject) => {
         db.run('UPDATE tables SET status = ? WHERE id = ?', [status, table_id], function(err) {
@@ -46,5 +59,6 @@ module.exports = {
     checkTableExists,
     checkUserExists,
     insertNewOrder,
+    hasActiveOrderForTable,
     updateTableStatus
 };

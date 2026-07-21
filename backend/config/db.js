@@ -3,6 +3,7 @@ const sqlite3 = require("sqlite3").verbose();
 const migrateCategorySchema = require("../data/migrateCategorySchema");
 const migrateOrderSchema = require("../data/migrateOrderSchema");
 const migrateProductCategorySchema = require("../data/migrateProductCategorySchema");
+const migrateStoreSettingsSchema = require("../data/migrateStoreSettingsSchema");
 
 const dbPath = path.join(__dirname, "../data/coffee.sqlite");
 
@@ -51,6 +52,7 @@ function migrateTablesTable() {
 db.serialize(() => {
     db.run("PRAGMA foreign_keys = ON");
     migrateTablesTable();
+    migrateStoreSettingsSchema(db);
     migrateCategorySchema(db, () => migrateProductCategorySchema(db, () => migrateOrderSchema(db)));
 });
 

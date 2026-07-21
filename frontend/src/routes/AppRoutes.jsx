@@ -11,12 +11,11 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
-
-import CreateOrderPage from "../pages/CreateOrderPage"; 
+import CreateOrderPage from "../pages/CreateOrderPage";
+import SettingsPage from "../pages/SettingsPage";
 import AddItemPage from "../pages/AddItemPage";
-
 import PayOrderPage from "../pages/PayOrderPage";
-import OrderHistoryPage from "../pages/OrderHistoryPage"; 
+import OrderHistoryPage from "../pages/OrderHistoryPage";
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
@@ -132,6 +131,15 @@ function AppRoutes() {
                             <TablePage />
                         </ProtectedLayout>
                     </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedLayout>
+                        <SettingsPage />
+                    </ProtectedLayout>
                 }
             />
 

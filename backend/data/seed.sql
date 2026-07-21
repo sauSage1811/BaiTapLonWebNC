@@ -3,6 +3,9 @@ VALUES
 ('Quản trị viên', 'admin', '$2b$12$T.s4loLS.mLHQpbB0VieReIzhRjF6SXjQtU7b1sRGrXlHxj8KWxnS', 'admin', 'active', 'Tên quán cafe của bạn là gì?', '$2b$12$O1dOcLTWs2BXuneVAtVtuuC/Qy3rbm0VpzHvj92RoWe8SsbP5KbfS'),
 ('Nhân viên bán hàng', 'staff', '$2b$12$T.s4loLS.mLHQpbB0VieReIzhRjF6SXjQtU7b1sRGrXlHxj8KWxnS', 'staff', 'active', 'Thành phố bạn sống là gì?', '$2b$12$O1dOcLTWs2BXuneVAtVtuuC/Qy3rbm0VpzHvj92RoWe8SsbP5KbfS');
 
+INSERT INTO store_settings (id, store_name, phone, address, contact_email, opening_time, closing_time)
+VALUES (1, '', '', '', '', '', '');
+
 INSERT INTO categories (name, description)
 VALUES
 ('Cafe', 'Các loại cafe'),

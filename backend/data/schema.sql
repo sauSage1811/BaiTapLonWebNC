@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS tables;
 DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS store_settings;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -17,6 +18,17 @@ CREATE TABLE users (
     security_question TEXT,
     security_answer TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE store_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    store_name TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    address TEXT NOT NULL DEFAULT '',
+    contact_email TEXT NOT NULL DEFAULT '',
+    opening_time TEXT NOT NULL DEFAULT '',
+    closing_time TEXT NOT NULL DEFAULT '',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE categories (
