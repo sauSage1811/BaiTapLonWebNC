@@ -16,10 +16,9 @@ const payOrderRoute = require("./routes/payOrderRoute");
 
 const searchProductRoute = require("./routes/searchProductRoute");
 const revenueRoute = require("./routes/revenueRoute");
+const orderHistoryRoute = require('./routes/orderHistoryRoute');
 
 const app = express();
-
-
 const port = 3000;
 
 app.use(
@@ -39,6 +38,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/store-settings", storeSettingsRoutes);
 
 
+app.use('/api/orders', orderHistoryRoute);
+
+// Các route order khác nằm bên dưới
 app.use("/api/orders", createOrderRoute);
 app.use("/api/orders", addItemRoute);
 app.use("/api/orders", payOrderRoute);

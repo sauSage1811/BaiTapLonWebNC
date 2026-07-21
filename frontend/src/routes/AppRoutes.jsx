@@ -11,10 +11,11 @@ import Dashboard from "../pages/Dashboard";
 import CategoryPage from "../pages/CategoryPage";
 import ProductPage from "../pages/ProductPage";
 import TablePage from "../pages/TablePage";
-import SettingsPage from "../pages/SettingsPage";
-//
 import CreateOrderPage from "../pages/CreateOrderPage";
+import SettingsPage from "../pages/SettingsPage";
 import AddItemPage from "../pages/AddItemPage";
+import PayOrderPage from "../pages/PayOrderPage";
+import OrderHistoryPage from "../pages/OrderHistoryPage";
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
@@ -59,7 +60,7 @@ function AppRoutes() {
                 }
             />
 
-            {/* CREATE ODER*/}
+            {/* CREATE ORDER */}
             <Route
                 path="/create-order"
                 element={
@@ -69,7 +70,7 @@ function AppRoutes() {
                 }
             />
 
-            {/*  ODER item*/}
+            {/* ORDER ITEM */}
             <Route
                 path="/orders/:orderId/add-item"
                 element={
@@ -79,7 +80,27 @@ function AppRoutes() {
                 }
             />
 
+            {/* PAY ORDER */}
+            <Route
+                path="/orders/:orderId/pay"
+                element={
+                    <ProtectedLayout>
+                        <PayOrderPage />
+                    </ProtectedLayout>
+                }
+            />
 
+            {/* 2. THÊM ROUTE LỊCH SỬ ĐƠN HÀNG VÀO ĐÂY */}
+            <Route
+                path="/orders/history"
+                element={
+                    <ProtectedLayout>
+                        <OrderHistoryPage />
+                    </ProtectedLayout>
+                }
+            />
+
+            {/* Admin Routes */}
             <Route
                 path="/categories"
                 element={
