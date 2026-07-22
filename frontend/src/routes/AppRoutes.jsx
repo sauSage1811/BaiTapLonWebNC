@@ -17,6 +17,7 @@ import AddItemPage from "../pages/AddItemPage";
 
 import PayOrderPage from "../pages/PayOrderPage";
 import OrderHistoryPage from "../pages/OrderHistoryPage"; 
+import RevenuePage from "../pages/RevenuePage"; 
 
 function PrivateRoute({ children }) {
     const { user, loading } = useContext(AuthContext);
@@ -139,6 +140,18 @@ function AppRoutes() {
                     <AdminRoute>
                         <ProtectedLayout>
                             <TablePage />
+                        </ProtectedLayout>
+                    </AdminRoute>
+                }
+            />
+
+            {/*   Thêm Route Doanh thu cho Admin */}
+            <Route
+                path="/revenue"
+                element={
+                    <AdminRoute>
+                        <ProtectedLayout>
+                            <RevenuePage />
                         </ProtectedLayout>
                     </AdminRoute>
                 }

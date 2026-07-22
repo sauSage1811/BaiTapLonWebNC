@@ -88,7 +88,7 @@ async function deleteOrder(req, res) {
 }
 
 module.exports = {
-    getOrders,       // 👈 Thêm hàm này để map vào route GET /
+    getOrders,      
     getOrderDetail,
     payOrder,
     deleteOrder

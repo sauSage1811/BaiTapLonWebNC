@@ -13,7 +13,7 @@ function AddItemPage() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
 
-    // 1. Lấy danh mục và sản phẩm từ Backend
+    // 1. Lấy danh mục và sản phẩm từ Backend (Đã thêm lọc status === 'active')
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -22,7 +22,12 @@ function AddItemPage() {
                     api.get("/products")
                 ]);
                 setCategories(catRes.data.data || catRes.data || []);
-                setProducts(prodRes.data.data || prodRes.data || []);
+                
+                const rawProducts = prodRes.data.data || prodRes.data || [];
+                // Chỉ lấy những sản phẩm đang bật (active)
+                const activeProducts = rawProducts.filter(p => p.status === "active");
+                setProducts(activeProducts);
+
             } catch (err) {
                 console.error("Lỗi lấy dữ liệu menu:", err);
                 setMessage({ type: "error", text: "Không thể lấy danh sách menu món ăn." });
@@ -74,7 +79,7 @@ function AddItemPage() {
             // Gửi tuần tự tránh SQLite bị lock DB
             for (const item of cart) {
                 await api.post("/orders/add-item", {
-                    order_id: Number(orderId),     
+                    order_id: Number(orderId),    
                     product_id: Number(item.id),   
                     quantity: Number(item.quantity)
                 }, config);
@@ -167,7 +172,6 @@ function AddItemPage() {
                     
                     {cart.length === 0 ? (
                         <div style={{ color: "#aaa", textAlign: "center", padding: "40px 0" }}>
-                            <div style={{ fontSize: "35px" }}></div>
                             <p style={{ fontSize: "14px" }}>Chưa chọn món nào</p>
                         </div>
                     ) : (

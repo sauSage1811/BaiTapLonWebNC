@@ -7,21 +7,22 @@ import productIcon from "../assets/icons/product.svg";
 import tableIcon from "../assets/icons/table.svg";
 import logoutIcon from "../assets/icons/logout.svg";
 import orderIcon from "../assets/icons/order.svg";
-import historyIcon from "../assets/icons/history.svg"; // 👈 Import icon lịch sử vừa tạo
-
+import historyIcon from "../assets/icons/history.svg";
+import revenueIcon from "../assets/icons/revenue.svg";
 const adminMenuItems = [
     { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
     { to: "/categories", icon: categoryIcon, label: "Danh mục" },
     { to: "/products", icon: productIcon, label: "Menu" },
-    { to: "/tables", icon: tableIcon, label: "Bàn" },
+    { to: "/tables", icon: tableIcon, label: "Bàn" },   
     { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" },
-    { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" } // 👈 Dùng historyIcon
+    { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" },
+    { to: "/revenue", icon: revenueIcon, label: "Doanh thu" }
 ];
 
 const staffMenuItems = [
     { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
     { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" },
-    { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" } // 👈 Dùng historyIcon
+    { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" }
 ];
 
 function Sidebar({ collapsed, onToggle }) {
