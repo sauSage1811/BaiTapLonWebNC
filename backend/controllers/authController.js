@@ -6,7 +6,7 @@ const userModel = require("../models/userModel");
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS || 12);
-const ADMIN_INVITE_CODE = process.env.ADMIN_INVITE_CODE || "WEBNANGCAO";
+const ADMIN_INVITE_CODE = process.env.ADMIN_INVITE_CODE;
 
 function normalizeUsername(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -141,8 +141,10 @@ async function login(req, res) {
         res.json({
             success: true,
             message: "Đăng nhập thành công",
-            token,
-            user: sanitizeUser(user)
+            data: {
+                token,
+                user: sanitizeUser(user)
+            }
         });
         console.log("[LOGIN] Step 8: response sent OK");
     } catch (error) {
@@ -176,6 +178,7 @@ async function me(req, res) {
 
         res.json({
             success: true,
+            message: "Lay thong tin nguoi dung thanh cong",
             data: sanitizeUser(user)
         });
     } catch (error) {
@@ -189,7 +192,8 @@ async function me(req, res) {
 function logout(req, res) {
     res.json({
         success: true,
-        message: "Đăng xuất thành công"
+        message: "Đăng xuất thành công",
+        data: null
     });
 }
 
@@ -266,7 +270,8 @@ async function register(req, res) {
 
         res.status(201).json({
             success: true,
-            message: "Đăng ký tài khoản thành công"
+            message: "Đăng ký tài khoản thành công",
+            data: null
         });
     } catch (error) {
         res.status(500).json({
@@ -298,6 +303,7 @@ async function forgotPassword(req, res) {
 
         res.json({
             success: true,
+            message: "Lay cau hoi bao mat thanh cong",
             data: {
                 security_question: user.security_question
             }
@@ -365,7 +371,8 @@ async function resetPassword(req, res) {
 
         res.json({
             success: true,
-            message: "Đặt lại mật khẩu thành công"
+            message: "Đặt lại mật khẩu thành công",
+            data: null
         });
     } catch (error) {
         res.status(500).json({

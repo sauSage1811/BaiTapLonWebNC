@@ -13,18 +13,11 @@ function RevenuePage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [activePreset, setActivePreset] = useState("all"); // "today", "yesterday", "last7", "thisMonth", "all"
 
-    useEffect(() => {
-        fetchRevenueData();
-    }, []);
-
-    const fetchRevenueData = async () => {
+    async function fetchRevenueData() {
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
-            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-            
-            const res = await api.get("/orders/history", config);
-            const rawOrders = res.data?.data || res.data || [];
+            const res = await api.get("/orders/history");
+            const rawOrders = res.data.data;
             
             // Chỉ lấy các đơn đã thanh toán
             const paidOrders = rawOrders.filter(order => {
@@ -39,7 +32,11 @@ function RevenuePage() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        Promise.resolve().then(fetchRevenueData);
+    }, []);
 
     // Hàm chuyển đổi Date thành định dạng YYYY-MM-DD theo giờ địa phương (local timezone)
     const formatLocalDate = (date) => {

@@ -83,14 +83,6 @@ function AppRoutes() {
             />
 
             {/*pay trước */}
-            <Route
-                path="/orders/:orderId/pay"
-                element={
-                    <ProtectedLayout>
-                        <PayOrderPage />
-                    </ProtectedLayout>
-                }
-            />
              {/*pay sau */}
             <Route
                 path="/orders/:orderId/payment"

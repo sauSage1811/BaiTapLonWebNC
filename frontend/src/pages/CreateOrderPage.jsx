@@ -11,18 +11,12 @@ function CreateOrderPage() {
     const [message, setMessage] = useState({ type: "", text: "" });
 
     // Hàm tiện ích để tự động cấu hình Header chứa Token gửi lên Backend
-    const getConfigWithToken = () => {
-        const token = localStorage.getItem("token");
-        return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    };
-
     // 1. Lấy danh sách bàn từ Backend
     useEffect(() => {
         const fetchTables = async () => {
             try {
-                const response = await api.get("/tables", getConfigWithToken());
-                const data = response.data.data || response.data;
-                setTables(data);
+                const response = await api.get("/tables");
+                setTables(response.data.data);
             } catch (err) {
                 console.error("Lỗi lấy danh sách bàn từ Backend:", err);
                 setMessage({ type: "error", text: "Không thể kết nối với máy chủ để lấy sơ đồ bàn. Bạn đã đăng nhập chưa?" });
@@ -43,15 +37,15 @@ function CreateOrderPage() {
         setMessage({ type: "", text: "" });
 
         try {
-            const response = await api.post("/orders/create", {
+            const response = await api.post("/orders", {
                 table_id: selectedTable,
                 note: note
-            }, getConfigWithToken());
+            });
 
-            if (response.data.success || response.status === 200 || response.status === 201) {
+            if (response.data.success) {
                 setMessage({ type: "success", text: "✅ Khởi tạo đơn hàng thành công!" });
                 
-                const orderId = response.data.order_id || response.data.data?.id;
+                const orderId = response.data.data?.id;
 
                 if (orderId) {
                     setTimeout(() => {
@@ -89,15 +83,15 @@ function CreateOrderPage() {
         }
 
         try {
-            const response = await api.post("/orders/create", {
+            const response = await api.post("/orders", {
                 table_id: takeawayTable.id,
                 note: note
-            }, getConfigWithToken());
+            });
 
-            if (response.data.success || response.status === 200 || response.status === 201) {
+            if (response.data.success) {
                 setMessage({ type: "success", text: "✅ Khởi tạo đơn hàng mang về thành công!" });
                 
-                const orderId = response.data.order_id || response.data.data?.id;
+                const orderId = response.data.data?.id;
                 
                 if (orderId) {
                     setTimeout(() => {
@@ -134,8 +128,8 @@ function CreateOrderPage() {
             if (!orderId) {
                 try {
                     setLoading(true);
-                    const res = await api.get(`/orders?table_id=${table.id}`, getConfigWithToken());
-                    const ordersData = res.data.data || res.data;
+                    const res = await api.get(`/orders?table_id=${table.id}`);
+                    const ordersData = res.data.data;
                     
                     // Lọc tìm đơn hàng chưa thanh toán / đang hoạt động
                     const activeOrder = Array.isArray(ordersData) 

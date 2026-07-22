@@ -14,11 +14,8 @@ function PayOrderPage() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                
-                const res = await api.get(`/orders/${orderId}`, config);
-                setOrder(res.data.data || res.data);
+                const res = await api.get(`/orders/${orderId}`);
+                setOrder(res.data.data);
             } catch (err) {
                 console.error("Lỗi lấy chi tiết đơn hàng:", err);
                 alert("Không thể tải thông tin hóa đơn này!");
@@ -35,14 +32,10 @@ function PayOrderPage() {
 
         setSubmitting(true);
         try {
-            const token = localStorage.getItem("token");
-            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-
-            await api.post("/orders/pay", {
-                order_id: Number(orderId),
+            await api.post(`/orders/${orderId}/pay`, {
                 table_id: order?.table_id,
                 payment_method: paymentMethod
-            }, config);
+            });
 
             alert("🎉 Thanh toán thành công!");
             navigate("/"); 

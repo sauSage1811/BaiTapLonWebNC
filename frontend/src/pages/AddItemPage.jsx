@@ -21,9 +21,9 @@ function AddItemPage() {
                     api.get("/categories"),
                     api.get("/products")
                 ]);
-                setCategories(catRes.data.data || catRes.data || []);
+                setCategories(catRes.data.data);
                 
-                const rawProducts = prodRes.data.data || prodRes.data || [];
+                const rawProducts = prodRes.data.data;
                 // Chỉ lấy những sản phẩm đang bật (active)
                 const activeProducts = rawProducts.filter(p => p.status === "active");
                 setProducts(activeProducts);
@@ -73,23 +73,19 @@ function AddItemPage() {
         setMessage({ type: "", text: "" });
 
         try {
-            const token = localStorage.getItem("token");
-            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-
             // Gửi tuần tự tránh SQLite bị lock DB
             for (const item of cart) {
-                await api.post("/orders/add-item", {
-                    order_id: Number(orderId),    
+                await api.post(`/orders/${orderId}/items`, {
                     product_id: Number(item.id),   
                     quantity: Number(item.quantity)
-                }, config);
+                });
             }
 
             setMessage({ type: "success", text: " Thêm các món thành công! Đang chuyển sang trang thanh toán..." });
             
             // Nhảy sang màn tính tiền chốt hạ sau 1.2s
             setTimeout(() => {
-                navigate(`/orders/${orderId}/pay`);
+                navigate(`/orders/${orderId}/payment`);
             }, 1200);
 
         } catch (err) {

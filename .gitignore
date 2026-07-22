@@ -6,3 +6,4 @@ backend/data/coffee.sqlite
 *.log
 .DS_Store
 .idea/
+.vscode/

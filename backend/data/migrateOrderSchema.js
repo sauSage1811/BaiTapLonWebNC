@@ -128,7 +128,7 @@ function buildOrderItemsInsert(columns) {
     `;
 }
 
-function runMigration(db, hasOrderItems, hasLegacyLineTable, orderColumns, itemColumns) {
+function runMigration(db, hasOrderItems, hasLegacyLineTable, orderColumns, itemColumns, callback = () => {}) {
     const statements = [
         "PRAGMA foreign_keys = OFF;",
         "BEGIN TRANSACTION;",
@@ -223,23 +223,30 @@ function runMigration(db, hasOrderItems, hasLegacyLineTable, orderColumns, itemC
         if (err) {
             db.exec("ROLLBACK; PRAGMA foreign_keys = ON;", () => {});
             console.error("Loi migrate schema don hang:", err.message);
+            callback(err);
             return;
         }
 
         db.all("PRAGMA foreign_key_check", (checkErr, rows) => {
             if (checkErr) {
                 console.error("Loi kiem tra foreign key don hang:", checkErr.message);
+                callback(checkErr);
                 return;
             }
 
             if (rows.length > 0) {
-                console.error("Schema don hang con foreign key khong hop le:", rows);
+                const fkError = new Error("Schema don hang con foreign key khong hop le");
+                console.error(fkError.message, rows);
+                callback(fkError);
+                return;
             }
+
+            callback();
         });
     });
 }
 
-function migrateOrderSchema(db) {
+function migrateOrderSchema(db, callback = () => {}) {
     db.all(
         `
         SELECT name, type, sql
@@ -261,6 +268,7 @@ function migrateOrderSchema(db) {
         (err, objects) => {
             if (err) {
                 console.error("Loi kiem tra schema don hang:", err.message);
+                callback(err);
                 return;
             }
 
@@ -270,6 +278,7 @@ function migrateOrderSchema(db) {
             const hasLegacyLineTable = byName.has(LEGACY_LINE_TABLE);
 
             if (!hasOrders) {
+                callback();
                 return;
             }
 
@@ -295,18 +304,21 @@ function migrateOrderSchema(db) {
                 !hasAllTriggers;
 
             if (!needsMigration) {
+                callback();
                 return;
             }
 
             db.all("PRAGMA table_info(orders)", (ordersErr, orderRows) => {
                 if (ordersErr) {
                     console.error("Loi doc cot orders:", ordersErr.message);
+                    callback(ordersErr);
                     return;
                 }
 
                 db.all("PRAGMA table_info(order_items)", (itemsErr, itemRows) => {
                     if (itemsErr && hasOrderItems) {
                         console.error("Loi doc cot order_items:", itemsErr.message);
+                        callback(itemsErr);
                         return;
                     }
 
@@ -315,7 +327,8 @@ function migrateOrderSchema(db) {
                         hasOrderItems,
                         hasLegacyLineTable,
                         new Set(orderRows.map((column) => column.name)),
-                        new Set((itemRows || []).map((column) => column.name))
+                        new Set((itemRows || []).map((column) => column.name)),
+                        callback
                     );
                 });
             });

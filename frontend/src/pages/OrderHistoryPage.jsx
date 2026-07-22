@@ -19,31 +19,25 @@
         }, []);
 
         // 1. Gọi API Lấy Danh Sách Lịch Sử (/api/orders/history)
-        const fetchHistory = async () => {
+        async function fetchHistory() {
             try {
                 setLoading(true);
-                const token = localStorage.getItem("token");
-                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                
-                const res = await api.get("/orders/history", config);
-                setOrders(res.data?.data || res.data || []);
+                const res = await api.get("/orders/history");
+                setOrders(res.data.data);
             } catch (err) {
                 console.error("Lỗi tải lịch sử đơn hàng:", err);
                 alert("Không thể tải danh sách lịch sử đơn hàng!");
             } finally {
                 setLoading(false);
             }
-        };
+        }
 
         // 2. Gọi API Lấy Chi Tiết Đơn Hàng (/api/orders/:orderId)
         const handleViewDetail = async (orderId) => {
             try {
                 setLoadingDetail(true);
-                const token = localStorage.getItem("token");
-                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                
-                const res = await api.get(`/orders/${orderId}`, config);
-                setSelectedOrder(res.data?.data || res.data);
+                const res = await api.get(`/orders/${orderId}`);
+                setSelectedOrder(res.data.data);
             } catch (err) {
                 console.error("Lỗi lấy chi tiết đơn hàng:", err);
                 alert("Không thể tải chi tiết hóa đơn này!");
@@ -59,10 +53,7 @@
             }
 
             try {
-                const token = localStorage.getItem("token");
-                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                
-                await api.delete(`/orders/${orderId}`, config);
+                await api.delete(`/orders/${orderId}`);
                 
                 // Cập nhật lại state trực tiếp để giao diện tự mất đơn vừa xóa mà không cần fetch lại từ đầu
                 setOrders(orders.filter(order => order.id !== orderId));

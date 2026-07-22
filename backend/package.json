@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "dev": "nodemon app.js",
-    "init-db": "node data/initDatabase.js"
+    "db:init": "node data/initDatabase.js",
+    "db:migrate": "node data/runMigrations.js"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +19,6 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.5",
     "sqlite3": "^6.0.1"
   },
   "devDependencies": {

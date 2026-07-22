@@ -58,10 +58,12 @@ export function AuthProvider({ children }) {
 
     const login = async (username, password) => {
         const res = await loginApi({ username, password });
-        const nextUser = res.data.user || null;
-        const token = res.data.token;
+        const nextUser = res.data.data?.user || null;
+        const token = res.data.data?.token;
 
-        localStorage.setItem("token", token);
+        if (token) {
+            localStorage.setItem("token", token);
+        }
         if (nextUser) {
             localStorage.setItem("user", JSON.stringify(nextUser));
         }

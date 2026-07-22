@@ -33,6 +33,7 @@ function index(req, res) {
 
         res.json({
             success: true,
+            message: "Lay danh sach danh muc thanh cong",
             data: categories
         });
     });
@@ -62,6 +63,7 @@ function show(req, res) {
 
         res.json({
             success: true,
+            message: "Lay danh muc thanh cong",
             data: category
         });
     });
@@ -195,7 +197,8 @@ function destroy(req, res) {
 
                 res.json({
                     success: true,
-                    message: "Xóa danh mục thành công"
+                    message: "Xóa danh mục thành công",
+                    data: null
                 });
             });
         });

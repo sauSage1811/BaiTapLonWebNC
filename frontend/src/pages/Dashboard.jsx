@@ -28,9 +28,6 @@ function Dashboard() {
             ["tables", "/tables"]
         ];
 
-        setStatsLoading(true);
-        setStatsError("");
-
         Promise.allSettled(requests.map(([, url]) => api.get(url)))
             .then((results) => {
                 if (ignore) return;

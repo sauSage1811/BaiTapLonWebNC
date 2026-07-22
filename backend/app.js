@@ -1,49 +1,39 @@
 require("dotenv").config();
 
+["JWT_SECRET", "ADMIN_INVITE_CODE"].forEach((key) => {
+    if (!process.env[key]) {
+        throw new Error(`Missing required environment variable: ${key}`);
+    }
+});
+
 const express = require("express");
 const cors = require("cors");
-const db = require("./config/db");
 
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tableRoutes = require("./routes/tableRoutes");
-
-const createOrderRoute = require("./routes/createOrderRoute");
-const addItemRoute = require("./routes/addItemRoute");
-const payOrderRoute = require("./routes/payOrderRoute");
-
-const searchProductRoute = require("./routes/searchProductRoute");
+const orderRoutes = require("./routes/orderRoutes");
 const revenueRoute = require("./routes/revenueRoute");
-const orderHistoryRoute = require('./routes/orderHistoryRoute');
 
 const app = express();
-const port = 3000; 
+const port = process.env.PORT || 3000;
+const frontendUrl = process.env.FRONTEND_URL;
 
 app.use(
     cors({
-        origin: ["http://localhost:5173", "http://127.0.0.1:5173"], 
+        origin: frontendUrl ? [frontendUrl, "http://127.0.0.1:5173"] : ["http://localhost:5173", "http://127.0.0.1:5173"],
         credentials: true
     })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Các route cơ bản
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/tables", tableRoutes);
 app.use("/api/auth", authRoutes);
-
-
-app.use('/api/orders', orderHistoryRoute);
-
-// Các route order khác nằm bên dưới
-app.use("/api/orders", createOrderRoute);  
-app.use("/api/orders", addItemRoute);      
-app.use("/api/orders", payOrderRoute);     
-
-app.use("/api/search", searchProductRoute);
+app.use("/api/orders", orderRoutes);
 app.use("/api/analytics", revenueRoute);
 
 app.listen(port, () => {
