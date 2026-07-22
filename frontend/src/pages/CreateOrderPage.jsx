@@ -31,11 +31,11 @@ function CreateOrderPage() {
         fetchTables();
     }, []);
 
-    // 2. Xử lý tạo Đơn Hàng Tại Bàn
+    // 2. Xử lý tạo Đơn Hàng Tại Bàn (Dành cho bàn trống)
     const handleCreateOrder = async (e) => {
         e.preventDefault();
         if (!selectedTable) {
-            setMessage({ type: "error", text: "Vui lòng chọn một bàn trên sơ đồ trước!" });
+            setMessage({ type: "error", text: "Vui lòng chọn một bàn trống trên sơ đồ trước!" });
             return;
         }
 
@@ -49,9 +49,8 @@ function CreateOrderPage() {
             }, getConfigWithToken());
 
             if (response.data.success || response.status === 200 || response.status === 201) {
-                setMessage({ type: "success", text: " Khởi tạo đơn hàng thành công!" });
+                setMessage({ type: "success", text: "✅ Khởi tạo đơn hàng thành công!" });
                 
-                // ĐÃ SỬA: Lấy chính xác response.data.order_id từ Backend trả về
                 const orderId = response.data.order_id || response.data.data?.id;
 
                 if (orderId) {
@@ -96,9 +95,8 @@ function CreateOrderPage() {
             }, getConfigWithToken());
 
             if (response.data.success || response.status === 200 || response.status === 201) {
-                setMessage({ type: "success", text: " Khởi tạo đơn hàng mang về thành công!" });
+                setMessage({ type: "success", text: "✅ Khởi tạo đơn hàng mang về thành công!" });
                 
-                // ĐÃ SỬA: Lấy chính xác response.data.order_id từ Backend trả về
                 const orderId = response.data.order_id || response.data.data?.id;
                 
                 if (orderId) {
@@ -120,6 +118,48 @@ function CreateOrderPage() {
         }
     };
 
+    // 4. Xử lý khi bấm vào bàn (Tự động tìm đơn hàng nếu bàn đang có khách)
+    const handleTableClick = async (table) => {
+        const isUsing = table.status === "using";
+        const isMaintenance = table.status === "maintenance";
+
+        if (isMaintenance || table.is_active === false) {
+            return; 
+        }
+
+        if (isUsing) {
+            let orderId = table.current_order_id || table.order_id || table.active_order_id;
+
+            // Nếu dữ liệu bàn chưa có sẵn ID đơn hàng, gọi API để tìm đơn đang mở của bàn này
+            if (!orderId) {
+                try {
+                    setLoading(true);
+                    const res = await api.get(`/orders?table_id=${table.id}`, getConfigWithToken());
+                    const ordersData = res.data.data || res.data;
+                    
+                    // Lọc tìm đơn hàng chưa thanh toán / đang hoạt động
+                    const activeOrder = Array.isArray(ordersData) 
+                        ? ordersData.find(o => o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'paid')
+                        : ordersData;
+
+                    orderId = activeOrder?.id || activeOrder?.order_id;
+                } catch (err) {
+                    console.error("Lỗi tự động tìm đơn hàng của bàn:", err);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            if (orderId) {
+                navigate(`/orders/${orderId}/payment`); 
+            } else {
+                setMessage({ type: "error", text: `Bàn ${table.name} đang có khách nhưng không tìm thấy đơn hàng hoạt động tương ứng!` });
+            }
+        } else {
+            setSelectedTable(table.id);
+        }
+    };
+
     return (
         <div style={{ padding: "30px", maxWidth: "1000px", margin: "0 auto", fontFamily: "Segoe UI, sans-serif" }}>
             {/* Header */}
@@ -128,7 +168,7 @@ function CreateOrderPage() {
                     <h2 style={{ margin: 0, color: "#4A3B32", display: "flex", alignItems: "center", gap: "10px" }}>
                         ☕ Sơ Đồ Gọi Món Tại Bàn
                     </h2>
-                    <p style={{ margin: "5px 0 0 0", color: "#888", fontSize: "14px" }}>Chọn bàn trống trực quan bên dưới để khởi tạo hóa đơn thực tế.</p>
+                    <p style={{ margin: "5px 0 0 0", color: "#888", fontSize: "14px" }}>Chọn bàn trống để gọi món mới hoặc bấm vào bàn có khách để thanh toán.</p>
                 </div>
             </div>
 
@@ -164,21 +204,21 @@ function CreateOrderPage() {
                                 const isSelected = selectedTable === table.id;
                                 const isUsing = table.status === "using";
                                 const isMaintenance = table.status === "maintenance";
-                                const isDisable = isUsing || isMaintenance || table.is_active === false;
+                                const isDisable = isMaintenance || table.is_active === false;
 
                                 return (
                                     <div 
                                         key={table.id}
-                                        onClick={() => !isDisable && setSelectedTable(table.id)}
+                                        onClick={() => !isDisable && handleTableClick(table)}
                                         style={{
-                                            padding: "20px 10px",
+                                            padding: "15px 10px",
                                             borderRadius: "12px",
                                             textAlign: "center",
                                             cursor: isDisable ? "not-allowed" : "pointer",
                                             position: "relative",
                                             transition: "all 0.2s ease",
                                             border: isSelected ? "2px solid #8B5A2B" : "1px solid #e0e0e0",
-                                            backgroundColor: isMaintenance ? "#f9fafb" : isUsing ? "#fdf2f2" : isSelected ? "#FDF5E6" : "#ffffff",
+                                            backgroundColor: isMaintenance ? "#f9fafb" : isUsing ? "#fff5f5" : isSelected ? "#FDF5E6" : "#ffffff",
                                             boxShadow: isSelected ? "0 4px 12px rgba(139, 90, 43, 0.2)" : "0 2px 5px rgba(0,0,0,0.05)",
                                             transform: isSelected ? "scale(1.03)" : "none",
                                             opacity: isMaintenance ? 0.6 : 1
@@ -194,21 +234,46 @@ function CreateOrderPage() {
                                             backgroundColor: isUsing ? "#e02424" : isMaintenance ? "#f59e0b" : "#10b981"
                                         }} />
 
-                                        <div style={{ fontSize: "28px", marginBottom: "8px" }}></div>
-                                        <div style={{ fontWeight: "bold", color: "#333", fontSize: "15px" }}>
+                                        <div style={{ fontWeight: "bold", color: "#333", fontSize: "15px", marginTop: "4px" }}>
                                             {table.name?.toLowerCase().includes("bàn") ? table.name : `Bàn ${table.name || table.id}`}
                                         </div>
-                                        <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+                                        <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>
                                             {table.floor || "Tầng 1"}
                                         </div>
+                                        
+                                        {/* Trạng thái hiển thị */}
                                         <div style={{ 
                                             fontSize: "11px", 
-                                            marginTop: "8px", 
+                                            marginTop: "6px", 
                                             fontWeight: "600",
                                             color: isUsing ? "#e02424" : isMaintenance ? "#f59e0b" : "#10b981"
                                         }}>
                                             {isUsing ? "Có khách" : isMaintenance ? "Bảo trì" : "Sẵn sàng"}
                                         </div>
+
+                                        {/* Nút Thanh toán nhanh nếu bàn đang bận */}
+                                        {isUsing && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleTableClick(table);
+                                                }}
+                                                style={{
+                                                    marginTop: "10px",
+                                                    width: "100%",
+                                                    padding: "4px 8px",
+                                                    backgroundColor: "#dc3545",
+                                                    color: "#fff",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    fontSize: "11px",
+                                                    fontWeight: "bold",
+                                                    cursor: "pointer"
+                                                }}
+                                            >
+                                                Thanh toán
+                                            </button>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -241,7 +306,7 @@ function CreateOrderPage() {
                                 {selectedTable 
                                     ? (() => {
                                         const currentTable = tables.find(t => t.id === selectedTable);
-                                        return ` Đang chọn: ${currentTable?.name?.toLowerCase().includes("bàn") ? currentTable.name : `Bàn ${currentTable?.name || selectedTable}`}`;
+                                        return `Đang chọn: ${currentTable?.name?.toLowerCase().includes("bàn") ? currentTable.name : `Bàn ${currentTable?.name || selectedTable}`}`;
                                       })()
                                     : "Chưa chọn bàn nào"
                                 }
@@ -284,7 +349,7 @@ function CreateOrderPage() {
                                 marginBottom: "12px"
                             }}
                         >
-                            {loading ? " Đang kết nối..." : "  Gọi Món"}
+                            {loading ? " Đang kết nối..." : " Gọi Món"}
                         </button>
 
                         <button 

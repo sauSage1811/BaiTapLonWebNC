@@ -81,7 +81,7 @@ function AppRoutes() {
                 }
             />
 
-            {/* PAY ORDER */}
+            {/*pay trước */}
             <Route
                 path="/orders/:orderId/pay"
                 element={
@@ -90,8 +90,17 @@ function AppRoutes() {
                     </ProtectedLayout>
                 }
             />
+             {/*pay sau */}
+            <Route
+                path="/orders/:orderId/payment"
+                element={
+                    <ProtectedLayout>
+                        <PayOrderPage />
+                    </ProtectedLayout>
+                }
+            />
 
-            {/* 2. THÊM ROUTE LỊCH SỬ ĐƠN HÀNG VÀO ĐÂY */}
+            {/* LỊCH SỬ ĐƠN HÀNG */}
             <Route
                 path="/orders/history"
                 element={

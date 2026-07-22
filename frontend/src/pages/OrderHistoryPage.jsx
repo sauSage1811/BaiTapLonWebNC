@@ -52,6 +52,33 @@ function OrderHistoryPage() {
         }
     };
 
+    // 3. Gọi API Xóa Đơn Hàng (/api/orders/:orderId)
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm(`Bạn có chắc chắn muốn xóa đơn hàng #${orderId} này không?`)) {
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("token");
+            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+            
+            await api.delete(`/orders/${orderId}`, config);
+            
+            // Cập nhật lại state trực tiếp để giao diện tự mất đơn vừa xóa mà không cần fetch lại từ đầu
+            setOrders(orders.filter(order => order.id !== orderId));
+            
+            // Nếu đang mở modal chi tiết của đúng đơn hàng bị xóa thì đóng modal lại
+            if (selectedOrder && selectedOrder.id === orderId) {
+                setSelectedOrder(null);
+            }
+
+            alert("Đã xóa đơn hàng thành công!");
+        } catch (err) {
+            console.error("Lỗi xóa đơn hàng:", err);
+            alert(err.response?.data?.message || "Không thể xóa đơn hàng này!");
+        }
+    };
+
     // Lọc theo trạng thái và ngày tháng năm
     const filteredOrders = orders.filter(order => {
         // Lọc theo trạng thái
@@ -63,7 +90,6 @@ function OrderHistoryPage() {
         if (startDate || endDate) {
             if (!order.created_at) return false;
             
-            // Chuyển đổi định dạng ngày của đơn hàng về YYYY-MM-DD để so sánh
             const orderDateStr = new Date(order.created_at).toISOString().split('T')[0];
 
             if (startDate && orderDateStr < startDate) {
@@ -85,7 +111,7 @@ function OrderHistoryPage() {
     };
 
     if (loading) {
-        return <div style={{ padding: "40px", textAlign: "center", fontSize: "16px" }}> Đang tải lịch sử đơn hàng...</div>;
+        return <div style={{ padding: "40px", textAlign: "center", fontSize: "16px" }}>⏳ Đang tải lịch sử đơn hàng...</div>;
     }
 
     return (
@@ -93,7 +119,7 @@ function OrderHistoryPage() {
             
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h2 style={{ margin: 0, color: "#4A3B32" }}>📜 Lịch Sử Hóa Đơn</h2>
+                <h2 style={{ margin: 0, color: "#4A3B32" }}> Lịch Sử Hóa Đơn</h2>
                 <button 
                     onClick={fetchHistory}
                     style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontWeight: "bold" }}
@@ -102,7 +128,7 @@ function OrderHistoryPage() {
                 </button>
             </div>
 
-            {/* Khu vực bộ lọc (Trạng thái + Ngày tháng) */}
+            {/* Khu vực bộ lọc */}
             <div style={{ background: "#f8f9fa", padding: "15px", borderRadius: "10px", marginBottom: "20px", display: "flex", flexWrap: "wrap", gap: "15px", alignItems: "center", justifyContent: "space-between" }}>
                 
                 {/* Tab lọc trạng thái */}
@@ -160,7 +186,6 @@ function OrderHistoryPage() {
                         </button>
                     )}
                 </div>
-
             </div>
 
             {/* BẢNG DANH SÁCH LỊCH SỬ */}
@@ -204,17 +229,33 @@ function OrderHistoryPage() {
                                         <button
                                             onClick={() => handleViewDetail(item.id)}
                                             style={{
-                                                padding: "6px 14px",
+                                                padding: "6px 12px",
                                                 borderRadius: "6px",
                                                 border: "none",
                                                 backgroundColor: "#17a2b8",
                                                 color: "#fff",
                                                 fontWeight: "bold",
                                                 cursor: "pointer",
-                                                fontSize: "13px"
+                                                fontSize: "13px",
+                                                marginRight: "6px"
                                             }}
                                         >
                                             Xem chi tiết
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteOrder(item.id)}
+                                            style={{
+                                                padding: "6px 12px",
+                                                borderRadius: "6px",
+                                                border: "none",
+                                                backgroundColor: "#dc3545",
+                                                color: "#fff",
+                                                fontWeight: "bold",
+                                                cursor: "pointer",
+                                                fontSize: "13px"
+                                            }}
+                                        >
+                                            Xóa
                                         </button>
                                     </td>
                                 </tr>
@@ -315,15 +356,26 @@ function OrderHistoryPage() {
                                         </span>
                                     </div>
 
-                                    <button 
-                                        onClick={() => setSelectedOrder(null)}
-                                        style={{
-                                            width: "100%", marginTop: "20px", padding: "10px", borderRadius: "8px",
-                                            border: "none", background: "#6c757d", color: "#fff", fontWeight: "bold", cursor: "pointer"
-                                        }}
-                                    >
-                                        Đóng lại
-                                    </button>
+                                    <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                                        <button 
+                                            onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                            style={{
+                                                flex: 1, padding: "10px", borderRadius: "8px",
+                                                border: "none", background: "#dc3545", color: "#fff", fontWeight: "bold", cursor: "pointer"
+                                            }}
+                                        >
+                                            Xóa đơn này
+                                        </button>
+                                        <button 
+                                            onClick={() => setSelectedOrder(null)}
+                                            style={{
+                                                flex: 1, padding: "10px", borderRadius: "8px",
+                                                border: "none", background: "#6c757d", color: "#fff", fontWeight: "bold", cursor: "pointer"
+                                            }}
+                                        >
+                                            Đóng lại
+                                        </button>
+                                    </div>
                                 </>
                             )
                         )}

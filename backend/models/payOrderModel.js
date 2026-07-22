@@ -52,8 +52,36 @@ function releaseTable(table_id) {
     });
 }
 
+// 3. THÊM HÀM NÀY ĐỂ XÓA ĐƠN HÀNG TRONG DATABASE
+function deleteOrderById(order_id) {
+    return new Promise((resolve, reject) => {
+        // Xóa các món thuộc order_items trước để tránh lỗi khóa ngoại
+        db.run('DELETE FROM order_items WHERE order_id = ?', [order_id], function(err) {
+            if (err) return reject(err);
+            
+            // Sau đó xóa đơn hàng trong bảng orders
+            db.run('DELETE FROM orders WHERE id = ?', [order_id], function(err) {
+                if (err) return reject(err);
+                resolve(this);
+            });
+        });
+    });
+}
+//
+function getOrdersByTableId(table_id) {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM orders WHERE table_id = ?";
+        db.all(sql, [table_id], (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+        });
+    });
+}
+
 module.exports = {
     getOrderSummary,
     updateOrderStatusToPaid,
-    releaseTable
+    releaseTable,
+    deleteOrderById,
+    getOrdersByTableId//
 };

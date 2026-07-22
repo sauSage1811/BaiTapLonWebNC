@@ -1,6 +1,23 @@
 const payOrderModel = require('../models/payOrderModel');
 
-// Lấy thông tin hóa đơn hiển thị lên màn hình thanh toán
+// 1. Lấy danh sách đơn hàng (hỗ trợ lọc theo table_id cho trang chọn bàn)
+async function getOrders(req, res) {
+    const { table_id } = req.query;
+    try {
+        let orders = [];
+        if (table_id) {
+            orders = await payOrderModel.getOrdersByTableId(table_id);
+        }
+        return res.json({
+            success: true,
+            data: orders
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+}
+
+// 2. Lấy thông tin hóa đơn hiển thị lên màn hình thanh toán
 async function getOrderDetail(req, res) {
     const orderId = req.params.id;
 
@@ -23,7 +40,7 @@ async function getOrderDetail(req, res) {
     }
 }
 
-// Chốt thanh toán
+// 3. Chốt thanh toán
 async function payOrder(req, res) {
     const { order_id } = req.body;
     if (!order_id) {
@@ -52,7 +69,27 @@ async function payOrder(req, res) {
     }
 }
 
+// 4. Xóa đơn hàng
+async function deleteOrder(req, res) {
+    const orderId = req.params.id;
+    try {
+        const order = await payOrderModel.getOrderSummary(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng!" });
+        }
+        await payOrderModel.deleteOrderById(orderId);
+        if (order.status !== 'paid' && order.table_id) {
+            await payOrderModel.releaseTable(order.table_id);
+        }
+        return res.json({ success: true, message: "Xóa đơn hàng thành công!" });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+}
+
 module.exports = {
+    getOrders,       // 👈 Thêm hàm này để map vào route GET /
     getOrderDetail,
-    payOrder
+    payOrder,
+    deleteOrder
 };

@@ -5,11 +5,11 @@ const tableController = require("../controllers/tableController");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
-// Everyone can read
+// Moi nguoi co the xem
 router.get("/", authMiddleware, tableController.index);
 router.get("/:id", authMiddleware, tableController.show);
 
-// Only admin can create/update/delete
+// chi admin create/update/delete
 router.post("/", authMiddleware, roleMiddleware("admin"), tableController.store);
 router.put("/:id", authMiddleware, roleMiddleware("admin"), tableController.update);
 router.put("/:id/status", authMiddleware, tableController.updateStatus);
