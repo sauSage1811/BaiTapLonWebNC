@@ -9,11 +9,12 @@ import logoutIcon from "../assets/icons/logout.svg";
 import orderIcon from "../assets/icons/order.svg";
 import historyIcon from "../assets/icons/history.svg";
 import revenueIcon from "../assets/icons/revenue.svg";
+
 const adminMenuItems = [
     { to: "/dashboard", icon: dashboardIcon, label: "Dashboard" },
     { to: "/categories", icon: categoryIcon, label: "Danh mục" },
     { to: "/products", icon: productIcon, label: "Menu" },
-    { to: "/tables", icon: tableIcon, label: "Bàn" },   
+    { to: "/tables", icon: tableIcon, label: "Bàn" },
     { to: "/create-order", icon: orderIcon, label: "Tạo đơn hàng" },
     { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" },
     { to: "/revenue", icon: revenueIcon, label: "Doanh thu" }
@@ -25,7 +26,7 @@ const staffMenuItems = [
     { to: "/orders/history", icon: historyIcon, label: "Lịch sử đơn hàng" }
 ];
 
-function Sidebar({ collapsed, onToggle }) {
+function Sidebar({ collapsed, mobileOpen, onToggle, onNavigate }) {
     const { user, logout } = useAuth();
     const menuItems = user?.role === "admin" ? adminMenuItems : staffMenuItems;
 
@@ -35,7 +36,7 @@ function Sidebar({ collapsed, onToggle }) {
     };
 
     return (
-        <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+        <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "open" : ""}`}>
             <div className="sidebar-brand">
                 <div className="sidebar-brand-inner">
                     <div className="sidebar-brand-icon">
@@ -43,18 +44,18 @@ function Sidebar({ collapsed, onToggle }) {
                     </div>
                     <div className="sidebar-brand-text">
                         <h2 className="logo">Cafe PKA</h2>
-                        <span className="logo-sub">Quản Lý Hệ Thống</span>
+                        <span className="logo-sub">Quản lý hệ thống</span>
                     </div>
                 </div>
                 <button
                     type="button"
                     className="sidebar-toggle"
                     onClick={onToggle}
-                    aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
                     aria-expanded={!collapsed}
-                    title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
                 >
-                    <span aria-hidden="true">≡</span>
+                    <span aria-hidden="true">☰</span>
                 </button>
             </div>
 
@@ -66,6 +67,8 @@ function Sidebar({ collapsed, onToggle }) {
                         key={item.to}
                         to={item.to}
                         title={item.label}
+                        data-tooltip={item.label}
+                        onClick={onNavigate}
                     >
                         <img
                             className="nav-icon"
@@ -79,7 +82,12 @@ function Sidebar({ collapsed, onToggle }) {
             </nav>
 
             <div className="sidebar-footer">
-                <button className="btn-logout sidebar-logout" onClick={handleLogout} title="Đăng xuất">
+                <button
+                    className="btn-logout sidebar-logout"
+                    onClick={handleLogout}
+                    title="Đăng xuất"
+                    data-tooltip="Đăng xuất"
+                >
                     <img src={logoutIcon} alt="" className="logout-icon" aria-hidden="true" />
                     <span className="nav-label">Đăng xuất</span>
                 </button>

@@ -15,6 +15,7 @@ const authRoutes = require("./routes/authRoutes");
 const tableRoutes = require("./routes/tableRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const revenueRoute = require("./routes/revenueRoute");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -35,6 +36,7 @@ app.use("/api/tables", tableRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/analytics", revenueRoute);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
